@@ -1,0 +1,10 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="com.example.module_android_demo.MainActivity" >
+ 
+    <item android:id="@+id/action_system" android:title="@string/action_system"></item>
+      <item android:id="@+id/action_lasterr" android:title="getlasterrinfo"></item>
+     <item android:id="@+id/action_qt" android:title="@string/action_qt"></item>
+    <item android:id="@+id/action_version" android:title="v3.0.0.0"></item>
+</menu>
