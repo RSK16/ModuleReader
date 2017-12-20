@@ -376,7 +376,7 @@ public class MainActivity extends TabActivity  {
 
 	//****************************************事件方式读取标签
 	MyBroadcastReceiver mBroadcastReceiver = new MyBroadcastReceiver();
-	public static final String BROADCAST_ACTION = "com.example.module_android_demo";
+	public static final String BROADCAST_ACTION = "com.reader.modulereader";
 	READER_ERR StartReadTags()
 	{
 		//初始化结BackReadOption
@@ -508,14 +508,14 @@ public class MainActivity extends TabActivity  {
 				.setContent(R.id.tab2);
 
 		tabHost.addTab(tp);
-		tabHost.addTab(tabHost.newTabSpec("tab3").setIndicator(MyApplication.Constr_RWLOP,
-				getResources().getDrawable(android.R.drawable.arrow_down_float)).setContent(
-				new Intent(this, Sub3TabActivity.class)));
-
-		tabHost.addTab(tabHost.newTabSpec("tab4").setIndicator(
-				MyApplication.Constr_set,
-				getResources().getDrawable(android.R.drawable.arrow_down_float)).setContent(
-				new Intent(this, Sub4TabActivity.class)));
+//		tabHost.addTab(tabHost.newTabSpec("tab3").setIndicator(MyApplication.Constr_RWLOP,
+//				getResources().getDrawable(android.R.drawable.arrow_down_float)).setContent(
+//				new Intent(this, Sub3TabActivity.class)));
+//
+//		tabHost.addTab(tabHost.newTabSpec("tab4").setIndicator(
+//				MyApplication.Constr_set,
+//				getResources().getDrawable(android.R.drawable.arrow_down_float)).setContent(
+//				new Intent(this, Sub4TabActivity.class)));
 
 		TabWidget tw=tabHost.getTabWidget();
 		if(RULE_NOSELPT)
@@ -558,7 +558,7 @@ public class MainActivity extends TabActivity  {
 		{
 			myapp.spf=new SPconfig(this);
 			myapp.Rpower=new RfidPower(PT);
-			String path=myapp.Rpower.GetDevPath();
+			String path=myapp.Rpower.GetDevPath();//链接读写器地址
 			if(myapp.Rpower.PowerUp())
 			{
 				READER_ERR er=myapp.Mreader.InitReader_Notype(path, 1);

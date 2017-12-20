@@ -15,127 +15,127 @@ import java.util.Map;
 
 public class MyApplication extends Application{
 
-	    //����
-		//*
-		public static String Constr_READ = "��";
-		public static String Constr_CONNECT = "����";
-		public static String Constr_INVENTORY = "�̵�";
-		public static String Constr_RWLOP = "��д��";
-		public static String Constr_set = "����";
-		public static String Constr_SetFaill = "����ʧ�ܣ�";
-		public static String Constr_GetFaill = "��ȡʧ�ܣ�";
-		public static String Constr_SetOk="���óɹ�";
-		public static String Constr_unsupport="��֧��";
-		public static String Constr_Putandexit = "�ٰ�һ���˳�����";
-		public static String[] Coname = new String[] { "���", "EPC ID", "����", "����",
-				"Э��", "RSSI", "Ƶ��", "�������� " };
-		public static String Constr_stopscan = "����ֹͣɨ��";
-		public static String Constr_hadconnected = "�Ѿ�����";
-		public static String Constr_plsetuuid = "�����ú�UUID:";
-		public static String Constr_pwderror = "�������";
-		public static String Constr_search = "����";
-		public static String Constr_stop = "ֹͣ";
+	//常量
+	//*
+	public static String Constr_READ = "读";
+	public static String Constr_CONNECT = "连接";
+	public static String Constr_INVENTORY = "盘点";
+	public static String Constr_RWLOP = "读写锁";
+	public static String Constr_set = "设置";
+	public static String Constr_SetFaill = "设置失败：";
+	public static String Constr_GetFaill = "获取失败：";
+	public static String Constr_SetOk="设置成功";
+	public static String Constr_unsupport="不支持";
+	public static String Constr_Putandexit = "再按一次退出程序";
+	public static String[] Coname = new String[] { "序号", "EPC ID", "次数", "天线",
+			"协议", "RSSI", "频率", "附加数据 " };
+	public static String Constr_stopscan = "请先停止扫描";
+	public static String Constr_hadconnected = "已经连接";
+	public static String Constr_plsetuuid = "请设置好UUID:";
+	public static String Constr_pwderror = "密码错误";
+	public static String Constr_search = "搜索";
+	public static String Constr_stop = "停止";
 
-		public static String Constr_createreaderok = "��д������ʧ��";
-		public static String[] pdaatpot = { "һ����", "˫����", "������", "������" };
-		    
-		public static String[] spibank={"������","EPC��","TID��","�û���"};
-		public static String[] spifbank={"EPC��","TID��","�û���"}; 
-		public static String[] spilockbank={"��������","��������","EPCbank","TIDbank","USERbank"}; 
-		public static String[] spilocktype={"������","��ʱ����","��������"};
-		public static String Constr_sub3readmem = "����ǩ";
-		public static String Constr_sub3writemem = "д��ǩ";
-		public static String Constr_sub3lockkill = "��������";
-		public static String Constr_sub3readfail = "��ʧ��:";
-		public static String Constr_sub3nodata = "������";
-		public static String Constr_sub3wrtieok = "д�ɹ�";
-		public static String Constr_sub3writefail = "дʧ��:";
-		public static String Constr_sub3lockok = "���ɹ�";
-		public static String Constr_sub3lockfail = "��ʧ��:";
-		public static String Constr_sub3killok = "���ٳɹ�";
-		public static String Constr_sub3killfial = "����ʧ��:";
-		
-		//String[] spireg={"�й�","����","�ձ�","����","ŷ��","ӡ��","���ô�","ȫƵ��"
-		//		,"�й�2"};
-		public static	String[] spireg = { "�й�", "����", "�ձ�", "����", "ŷ��", "ŷ��2", "ŷ��3", "ӡ��",
-	    "���ô�", "ȫƵ��", "�й�2" };	
-		public static String[] spinvmo={"��ͨģʽ","����ģʽ"};
-		public static String[] spitari={"25΢��","12.5΢��","6.25΢��"};
-		public static  String[] spiwmod={"��д","��д"};
-		public static String Auto="�Զ�";
-		public static String No="��";
-	    public static String Constr_sub4invenpra="�̵����";
-	    public static String Constr_sub4antpow = "���߹���";
-	    public static String Constr_sub4regionfre = "����Ƶ��";
-	    public static String Constr_sub4gen2opt = "Gen2��";
-	    public static String Constr_sub4invenfil = "�̵����";
-	    public static String Constr_sub4addidata = "��������";
-	    public static String Constr_sub4others = "��������";
-	    public static String Constr_sub4quickly = "����ģʽ";
-	    public static String Constr_sub4setmodefail = "����ģʽʧ��";
-	    public static String Constr_sub4setokresettoab = "���óɹ���������д����Ч";
-	    public static String Constr_sub4ndsapow = "���豸��Ҫ����һ��";
-	    public static String Constr_sub4unspreg = "��֧�ֵ�����";
+	public static String Constr_createreaderok = "读写器创建失败";
+	public static String[] pdaatpot = { "一天线", "双天线", "三天线", "四天线" };
 
-	    public static String[] spiregbs = { "����", "�й�", "ŷƵ", "�й�2" };
-		public static String Constr_subblmode = "ģʽ";
-		public static String Constr_subblinven = "�̵�";
-		public static String Constr_subblfil = "����";
-		public static String Constr_subblfre = "Ƶ��";
-		public static String Constr_subblnofre = "û��ѡ��Ƶ��";
-		
-		public static String[] cusreadwrite={"������","д����"};
-		public static String[] cuslockunlock={"��","����"};
-		
-		public static String Constr_subcsalterpwd="������";
-		public static String Constr_subcslockwpwd="��������";
-		public static String Constr_subcslockwoutpwd="����������";
-		public static String Constr_subcsplsetimeou="�����ó�ʱʱ��";
-		public static String Constr_subcsputcnpwd="���뵱ǰ������������";
-		public static String Constr_subcsplselreg="��ѡ������";
-		public static String Constr_subcsopfail="����ʧ��:";
-		public static String Constr_subcsputcurpwd="���뵱ǰ����";
+	public static String[] spibank={"保留区","EPC区","TID区","用户区"};
+	public static String[] spifbank={"EPC区","TID区","用户区"};
+	public static String[] spilockbank={"访问密码","销毁密码","EPCbank","TIDbank","USERbank"};
+	public static String[] spilocktype={"解锁定","暂时锁定","永久锁定"};
+	public static String Constr_sub3readmem = "读标签";
+	public static String Constr_sub3writemem = "写标签";
+	public static String Constr_sub3lockkill = "锁与销毁";
+	public static String Constr_sub3readfail = "读失败:";
+	public static String Constr_sub3nodata = "无数据";
+	public static String Constr_sub3wrtieok = "写成功";
+	public static String Constr_sub3writefail = "写失败:";
+	public static String Constr_sub3lockok = "锁成功";
+	public static String Constr_sub3lockfail = "锁失败:";
+	public static String Constr_sub3killok = "销毁成功";
+	public static String Constr_sub3killfial = "销毁失败:";
 
-		public static String Constr_subdbdisconnreconn = "�Ѿ��Ͽ�,������������";
-		public static String Constr_subdbhadconnected = "�Ѿ�����";
-		public static String Constr_subdbconnecting = "��������......";
-		public static String Constr_subdbrev = "����";
-		public static String Constr_subdbstop = "ֹͣ";
-		public static String Constr_subdbdalennot = "���ݳ��Ȳ���";
-		public static String Constr_subdbplpuhexchar = "������16�����ַ�";
-		
-		public static String Constr_subsysaveok = "����ɹ�";
-		public static String Constr_subsysout = "����txt����csv";
-		public static String Constr_subsysreavaid = "����������Ч";
-		public static String Constr_sub1recfailed = "��������ʧ��";
-		public static String Constr_subsysavefailed = "����ʧ��";
-		public static String Constr_subsysexefin ="ִ�����";
-		public static String Constr_sub1adrno="��ַû������";
-		public static String Constr_sub1pdtsl="��ѡ��ƽ̨";
-		public static String Constr_mainpu="�ϵ磺";
-		public static String Constr_nostopstreadfailed="��ͣ���̵�����ʧ��";
-		public static String Constr_nostopspreadfailed="��ͣ���̵�ֹͣʧ��";
-		public static String Constr_nostopreadfailed="��ʼ�̵�ʧ�ܣ�";
-		public static String Constr_connectok="���ӳɹ�";
-		public static String Constr_connectfialed="����ʧ��";
-		public static String Constr_disconpowdown="�Ͽ���д�����µ磺";
-		public static String Constr_ok="�ɹ�:";
-		public static String Constr_failed="ʧ��:";
-		public static String Constr_excep="�쳣:";
-		public static String Constr_setcep="�����쳣:";
-		public static String Constr_getcep="��ȡ�쳣:";
-		public static String Constr_killok="KILL�ɹ�";
-		public static String Constr_killfailed="KILLʧ��";
-		public static String Constr_psiant="��ѡ���̵�����";
-		public static String Constr_selpro="��ѡ��Э��";
-		public static String Constr_setpwd="���ù���:";
-	    //*/
+	//String[] spireg={"中国","北美","日本","韩国","欧洲","印度","加拿大","全频段"
+	//		,"中国2"};
+	public static	String[] spireg = { "中国", "北美", "日本", "韩国", "欧洲", "欧洲2", "欧洲3", "印度",
+			"加拿大", "全频段", "中国2" };
+	public static String[] spinvmo={"普通模式","高速模式"};
+	public static String[] spitari={"25微秒","12.5微秒","6.25微秒"};
+	public static  String[] spiwmod={"字写","块写"};
+	public static String Auto="自动";
+	public static String No="无";
+	public static String Constr_sub4invenpra="盘点参数";
+	public static String Constr_sub4antpow = "天线功率";
+	public static String Constr_sub4regionfre = "区域频率";
+	public static String Constr_sub4gen2opt = "Gen2项";
+	public static String Constr_sub4invenfil = "盘点过滤";
+	public static String Constr_sub4addidata = "附加数据";
+	public static String Constr_sub4others = "其他参数";
+	public static String Constr_sub4quickly = "快速模式";
+	public static String Constr_sub4setmodefail = "配置模式失败";
+	public static String Constr_sub4setokresettoab = "设置成功，重启读写器生效";
+	public static String Constr_sub4ndsapow = "该设备需要功率一致";
+	public static String Constr_sub4unspreg = "不支持的区域";
 
-		 
+	public static String[] spiregbs = { "北美", "中国", "欧频", "中国2" };
+	public static String Constr_subblmode = "模式";
+	public static String Constr_subblinven = "盘点";
+	public static String Constr_subblfil = "过滤";
+	public static String Constr_subblfre = "频率";
+	public static String Constr_subblnofre = "没有选择频点";
+
+	public static String[] cusreadwrite={"读操作","写操作"};
+	public static String[] cuslockunlock={"锁","解锁"};
+
+	public static String Constr_subcsalterpwd="改密码";
+	public static String Constr_subcslockwpwd="带密码锁";
+	public static String Constr_subcslockwoutpwd="不带密码锁";
+	public static String Constr_subcsplsetimeou="请设置超时时间";
+	public static String Constr_subcsputcnpwd="填入当前密码与新密码";
+	public static String Constr_subcsplselreg="请选择区域";
+	public static String Constr_subcsopfail="操作失败:";
+	public static String Constr_subcsputcurpwd="填入当前密码";
+
+	public static String Constr_subdbdisconnreconn = "已经断开,正在重新连接";
+	public static String Constr_subdbhadconnected = "已经连接";
+	public static String Constr_subdbconnecting = "正在连接......";
+	public static String Constr_subdbrev = "接收";
+	public static String Constr_subdbstop = "停止";
+	public static String Constr_subdbdalennot = "数据长度不对";
+	public static String Constr_subdbplpuhexchar = "请输入16进制字符";
+
+	public static String Constr_subsysaveok = "保存成功";
+	public static String Constr_subsysout = "输入txt或者csv";
+	public static String Constr_subsysreavaid = "重新连接生效";
+	public static String Constr_sub1recfailed = "重新连接失败";
+	public static String Constr_subsysavefailed = "保存失败";
+	public static String Constr_subsysexefin ="执行完毕";
+	public static String Constr_sub1adrno="地址没有输入";
+	public static String Constr_sub1pdtsl="请选择平台";
+	public static String Constr_mainpu="上电：";
+	public static String Constr_nostopstreadfailed="不停顿盘点启动失败";
+	public static String Constr_nostopspreadfailed="不停顿盘点停止失败";
+	public static String Constr_nostopreadfailed="开始盘点失败：";
+	public static String Constr_connectok="连接成功";
+	public static String Constr_connectfialed="连接失败";
+	public static String Constr_disconpowdown="断开读写器，下电：";
+	public static String Constr_ok="成功:";
+	public static String Constr_failed="失败:";
+	public static String Constr_excep="异常:";
+	public static String Constr_setcep="设置异常:";
+	public static String Constr_getcep="获取异常:";
+	public static String Constr_killok="KILL成功";
+	public static String Constr_killfailed="KILL失败";
+	public static String Constr_psiant="请选择盘点天线";
+	public static String Constr_selpro="请选择协议";
+	public static String Constr_setpwd="设置功率:";
+	//*/
+
+
 	/*
-	 * ��������   
+	 * 公共变量
 	 */
-	    public Map<String,TAGINFO> TagsMap=new LinkedHashMap<String,TAGINFO>();//����
+	    public Map<String,TAGINFO> TagsMap=new LinkedHashMap<String,TAGINFO>();//有序
 		public String path;
 	    public int ThreadMODE=0;
 		public int refreshtime=1000;

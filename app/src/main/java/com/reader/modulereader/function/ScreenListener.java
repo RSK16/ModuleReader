@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.PowerManager;
 
+
 public class ScreenListener {
 	private Context mContext;
 	private ScreenBroadcastReceiver mScreenReceiver;
@@ -17,7 +18,7 @@ public class ScreenListener {
 	}
 
 	/**
-	 * screen״̬�㲥������
+	 * screen状态广播接收者
 	 */
 	private class ScreenBroadcastReceiver extends BroadcastReceiver {
 		private String action = null;
@@ -25,19 +26,19 @@ public class ScreenListener {
 		@Override
 		public void onReceive(Context context, Intent intent) {
 			action = intent.getAction();
-			if (Intent.ACTION_SCREEN_ON.equals(action)) { // ����
+			if (Intent.ACTION_SCREEN_ON.equals(action)) { // 开屏
 				mScreenStateListener.onScreenOn();
-			} else if (Intent.ACTION_SCREEN_OFF.equals(action)) { // ����
-				 mScreenStateListener.onScreenOff();
-			} else if (Intent.ACTION_USER_PRESENT.equals(action)) { // ����
+			} else if (Intent.ACTION_SCREEN_OFF.equals(action)) { // 锁屏
+				mScreenStateListener.onScreenOff();
+			} else if (Intent.ACTION_USER_PRESENT.equals(action)) { // 解锁
 				//mScreenStateListener.onUserPresent();
-			} 
+			}
 		}
 	}
 
 	/**
-	 * ��ʼ����screen״̬
-	 * 
+	 * 开始监听screen状态
+	 *
 	 * @param listener
 	 */
 	public void begin(ScreenStateListener listener) {
@@ -47,7 +48,7 @@ public class ScreenListener {
 	}
 
 	/**
-	 * ��ȡscreen״̬
+	 * 获取screen状态
 	 */
 	private void getScreenState() {
 		PowerManager manager = (PowerManager) mContext
@@ -64,14 +65,14 @@ public class ScreenListener {
 	}
 
 	/**
-	 * ֹͣscreen״̬����
+	 * 停止screen状态监听
 	 */
 	public void unregisterListener() {
 		mContext.unregisterReceiver(mScreenReceiver);
 	}
 
 	/**
-	 * ����screen״̬�㲥������
+	 * 启动screen状态广播接收器
 	 */
 	private void registerListener() {
 		IntentFilter filter = new IntentFilter();
@@ -81,7 +82,7 @@ public class ScreenListener {
 		mContext.registerReceiver(mScreenReceiver, filter);
 	}
 
-	public interface ScreenStateListener {// ���ظ���������Ļ״̬��Ϣ
+	public interface ScreenStateListener {// 返回给调用者屏幕状态信息
 		public void onScreenOn();
 
 		public void onScreenOff();
