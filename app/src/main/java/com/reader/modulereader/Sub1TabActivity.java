@@ -23,7 +23,13 @@ import android.widget.Toast;
 
 import com.pow.api.cls.RfidPower;
 import com.reader.modulereader.function.SPconfig;
+import com.reader.modulereader.utils.EventBusUtils;
+import com.reader.modulereader.utils.MessageEvent;
+import com.reader.modulereader.utils.ToastUtil;
 import com.uhf.api.cls.Reader;
+
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -46,6 +52,23 @@ public class Sub1TabActivity<OpeListActivity> extends Activity {
 
 	MyApplication myapp;
 
+	@Override
+	protected void onDestroy() {
+		super.onDestroy();
+		EventBusUtils.unregister(this);
+	}
+	@Override
+	protected void onStart() {
+		super.onStart();
+		EventBusUtils.register(this);
+	}
+
+	@Subscribe(threadMode = ThreadMode.MAIN)
+	public void MessageEvent(MessageEvent event) {
+		if (event.getMsg().equals("sa")) {
+			connection();
+		}
+	}
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -92,56 +115,13 @@ public class Sub1TabActivity<OpeListActivity> extends Activity {
 				{
 					spinner_antports.setSelection(Integer.valueOf(antportstr));
 				}
-
 			//窗体事件
 				button_connect.setOnClickListener(new OnClickListener()
 				{
 					@Override
 					public void onClick(View arg0) {
-						// TODO Auto-generated method stub
-						EditText et1=(EditText)findViewById(R.id.editText_adr);
-					    String  ip=et1.getText().toString();
-					    if(ip=="")
-					    {
-					    	Toast.makeText(Sub1TabActivity.this, MyApplication.Constr_sub1adrno,
-							Toast.LENGTH_SHORT).show();
-					    }
-					    if(myapp.Rpower==null)
-					    {
-					    	Toast.makeText(Sub1TabActivity.this, MyApplication.Constr_sub1pdtsl,
-									Toast.LENGTH_SHORT).show();
-					    }
+//						connection();
 
-						boolean blen=myapp.Rpower.PowerUp();
-
-						Toast.makeText(Sub1TabActivity.this, MyApplication.Constr_mainpu+String.valueOf(blen),
-									Toast.LENGTH_SHORT).show();
-						if(!blen)
-						return;
-
-						Reader.READER_ERR er=myapp.Mreader.InitReader_Notype(ip, spinner_antports.getSelectedItemPosition()+1);
-
-						if(er== Reader.READER_ERR.MT_OK_ERR)
-						{
-							myapp.needlisen=true;
-							myapp.needreconnect=false;
-							myapp.spf.SaveString("PDATYPE", String.valueOf(spinner_pdatype.getSelectedItemPosition()));
-							myapp.spf.SaveString("ADDRESS", et1.getText().toString());
-							myapp.spf.SaveString("ANTPORT", String.valueOf(spinner_antports.getSelectedItemPosition()));
-
-							Toast.makeText(Sub1TabActivity.this, MyApplication.Constr_connectok,
-							Toast.LENGTH_SHORT).show();
-							myapp.antportc=spinner_antports.getSelectedItemPosition()+1;
-							ConnectHandleUI();
-							myapp.Address=ip;
-
-						}
-							else
-							{
-
-								Toast.makeText(Sub1TabActivity.this, MyApplication.Constr_connectfialed+
-							    er.toString(),Toast.LENGTH_SHORT).show();
-							}
 					}
 				});
 
@@ -207,6 +187,55 @@ public class Sub1TabActivity<OpeListActivity> extends Activity {
 
 				InputMethodManager.HIDE_NOT_ALWAYS);
 	}
+
+	public void connection() {
+		// TODO Auto-generated method stub
+		EditText et1=(EditText)findViewById(R.id.editText_adr);
+		et1.setText("/dev/ttyS2");
+		String  ip=et1.getText().toString();
+		if(ip=="")
+        {
+            Toast.makeText(Sub1TabActivity.this, MyApplication.Constr_sub1adrno,
+            Toast.LENGTH_SHORT).show();
+        }
+		if(myapp.Rpower==null)
+        {
+            Toast.makeText(Sub1TabActivity.this, MyApplication.Constr_sub1pdtsl,
+                    Toast.LENGTH_SHORT).show();
+        }
+
+		boolean blen=myapp.Rpower.PowerUp();
+
+		Toast.makeText(Sub1TabActivity.this, MyApplication.Constr_mainpu+String.valueOf(blen),
+                    Toast.LENGTH_SHORT).show();
+		if(!blen)
+        return;
+
+		Reader.READER_ERR er=myapp.Mreader.InitReader_Notype(ip, spinner_antports.getSelectedItemPosition()+1);
+
+		if(er== Reader.READER_ERR.MT_OK_ERR)
+        {
+            myapp.needlisen=true;
+            myapp.needreconnect=false;
+            myapp.spf.SaveString("PDATYPE", String.valueOf(spinner_pdatype.getSelectedItemPosition()));
+            myapp.spf.SaveString("ADDRESS", et1.getText().toString());
+            myapp.spf.SaveString("ANTPORT", String.valueOf(spinner_antports.getSelectedItemPosition()));
+
+            Toast.makeText(Sub1TabActivity.this, MyApplication.Constr_connectok,
+            Toast.LENGTH_SHORT).show();
+            myapp.antportc=spinner_antports.getSelectedItemPosition()+1;
+            ConnectHandleUI();
+            myapp.Address=ip;
+
+        }
+            else
+            {
+
+                Toast.makeText(Sub1TabActivity.this, MyApplication.Constr_connectfialed+
+                er.toString(),Toast.LENGTH_SHORT).show();
+            }
+	}
+
 	private void ConnectHandleUI()
 	{
 		try
@@ -380,9 +409,10 @@ public class Sub1TabActivity<OpeListActivity> extends Activity {
 	        this.button_disconnect.setEnabled(true);
 	        TabWidget tw=myapp.tabHost.getTabWidget();
 			 tw.getChildAt(1).setVisibility(View.VISIBLE);
-			 tw.getChildAt(2).setVisibility(View.VISIBLE);
-			 tw.getChildAt(3).setVisibility(View.VISIBLE);
+//			 tw.getChildAt(2).setVisibility(View.VISIBLE);
+//			 tw.getChildAt(3).setVisibility(View.VISIBLE);
 			 myapp.tabHost.setCurrentTab(1);
+		EventBusUtils.post(new MessageEvent("start"));
 	}
 	private void DisConnectHandleUI()
 	{
@@ -390,10 +420,10 @@ public class Sub1TabActivity<OpeListActivity> extends Activity {
 		button_connect.setEnabled(true);
 		 TabWidget tw=myapp.tabHost.getTabWidget();
 		 tw.getChildAt(1).setVisibility(View.INVISIBLE);
-		 tw.getChildAt(2).setVisibility(View.INVISIBLE);
-		 tw.getChildAt(3).setVisibility(View.INVISIBLE);
+//		 tw.getChildAt(2).setVisibility(View.INVISIBLE);
+//		 tw.getChildAt(3).setVisibility(View.INVISIBLE);
 		 TextView tv_module=(TextView)findViewById(R.id.textView_module);
-		 tv_module.setText("");
+
 	}
 	@Override
 	public boolean onKeyDown(int keyCode, KeyEvent event) {

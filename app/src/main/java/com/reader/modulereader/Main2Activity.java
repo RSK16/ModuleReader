@@ -7,9 +7,13 @@ import android.content.IntentFilter;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.widget.TabWidget;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.reader.modulereader.function.MyAdapter;
+import com.reader.modulereader.function.SPconfig;
 import com.uhf.api.cls.ReadListener;
 import com.uhf.api.cls.Reader;
 
@@ -33,13 +37,18 @@ public class Main2Activity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main2);
 
+        myapp=(MyApplication) getApplication();
+        myapp.Mreader=new Reader();
+
+        myapp.spf=new SPconfig(this);
+
         mBroadcastReceiver = new MyBroadcastReceiver();
         IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction(BROADCAST_ACTION2);
         registerReceiver(mBroadcastReceiver, intentFilter);
-
         initData();
     }
+
 
     private void initData() {
         try{

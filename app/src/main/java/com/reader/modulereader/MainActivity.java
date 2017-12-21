@@ -42,6 +42,9 @@ import com.reader.modulereader.function.MyAdapter;
 import com.reader.modulereader.function.MyEpListAdapter;
 import com.reader.modulereader.function.SPconfig;
 import com.reader.modulereader.function.ScreenListener;
+import com.reader.modulereader.utils.EventBusUtils;
+import com.reader.modulereader.utils.MessageEvent;
+import com.reader.modulereader.utils.ToastUtil;
 import com.uhf.api.cls.BackReadOption;
 import com.uhf.api.cls.ErrInfo;
 import com.uhf.api.cls.ReadExceptionListener;
@@ -60,6 +63,9 @@ import com.uhf.api.cls.Reader.Region_Conf;
 import com.uhf.api.cls.Reader.SL_TagProtocol;
 import com.uhf.api.cls.Reader.TAGINFO;
 import com.uhf.api.cls.Reader.TagFilter_ST;
+
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
 import java.io.DataOutputStream;
 import java.util.ArrayList;
@@ -94,8 +100,9 @@ public class MainActivity extends TabActivity  {
 	List<Map<String, ?>> ListMs = new ArrayList<Map<String, ?>>();
 	MyAdapter Adapter;
 	Map<String, String> h = new HashMap<String, String>();
+    private TextView mText;
 
-	public class MyBroadcastReceiver extends BroadcastReceiver {
+    public class MyBroadcastReceiver extends BroadcastReceiver {
 		public static final String TAG = "MyBroadcastReceiver";
 		@Override
 		public void onReceive(Context context, Intent intent) {
@@ -160,6 +167,12 @@ public class MainActivity extends TabActivity  {
 					StopHandleUI();
 					break;
 				}
+                case 4:
+                {
+
+                    startRead();
+                    break;
+                }
 			}
 		}
 	};
@@ -488,7 +501,7 @@ public class MainActivity extends TabActivity  {
 		String apkRoot="chmod 777 "+getPackageCodePath();
 
 		runRootCommand(apkRoot);
-
+        mText = findViewById(R.id.text);
 		soundPool= new SoundPool(10,AudioManager.STREAM_SYSTEM,5);
 		soundPool.load(this,R.raw.beep333,1);
 		Awl=new AndroidWakeLock((PowerManager) getSystemService(Context.POWER_SERVICE));
@@ -523,8 +536,8 @@ public class MainActivity extends TabActivity  {
 		else
 		{
 			tw.getChildAt(1).setVisibility(View.INVISIBLE);
-			tw.getChildAt(2).setVisibility(View.INVISIBLE);
-			tw.getChildAt(3).setVisibility(View.INVISIBLE);
+//			tw.getChildAt(2).setVisibility(View.INVISIBLE);
+//			tw.getChildAt(3).setVisibility(View.INVISIBLE);
 		}
 
 		Application app=getApplication();
@@ -603,80 +616,8 @@ public class MainActivity extends TabActivity  {
 			@Override
 			public void onClick(View arg0) {
 				// TODO Auto-generated method stub
-				try{
-
-					if(Adapter==null)
-					{
-						ListMs.add(h);
-						Adapter  = new MyAdapter(getApplicationContext(),ListMs,
-								R.layout.listitemview_inv, Coname,new int[] { R.id.textView_readsort,
-								R.id.textView_readepc, R.id.textView_readcnt,R.id.textView_readant,
-								R.id.textView_readpro,R.id.textView_readrssi,R.id.textView_readfre,
-								R.id.textView_reademd});
-
-						listView.setAdapter(Adapter);
-					}
-
-					boolean bl = true;
-					if(myapp.needreconnect)
-					{
-						int c=0;
-						do{
-							bl=reconnect();
-							if(!bl)
-								Toast.makeText(MainActivity.this, MyApplication.Constr_sub1recfailed,
-										Toast.LENGTH_SHORT).show();
-							c++;
-							if(c>0)
-								break;
-						}
-						while(true);
-					}
-					if(!bl)
-						return;
-
-					if(myapp.nostop)
-					{
-						READER_ERR er=myapp.Mreader.AsyncStartReading(myapp.Rparams.uants,
-								myapp.Rparams.uants.length, myapp.Rparams.option);
-						if(er!=READER_ERR.MT_OK_ERR)
-						{	 Toast.makeText(MainActivity.this, MyApplication.Constr_nostopreadfailed,
-								Toast.LENGTH_SHORT).show();
-							return;
-						}
-					}
-
-					if(myapp.ThreadMODE==0)
-						handler.postDelayed(runnable_MainActivity,0);
-					else if(myapp.ThreadMODE==1)
-					{
-						if(myapp.needlisen==true)
-						//设置盘存到标签时的回调处理函数
-						{ myapp.Mreader.addReadListener(RL);
-							//*
-							//设置读写器发生错误时的回调处理函数
-							myapp.Mreader.addReadExceptionListener(REL);
-							myapp.needlisen=false;
-						}
-
-						//广播形式
-						if (StartReadTags()!= READER_ERR.MT_OK_ERR)
-						{
-							Toast.makeText(MainActivity.this, MyApplication.Constr_nostopreadfailed,
-									Toast.LENGTH_SHORT).show();
-							return;
-						}
-					}
-
-					myapp.TagsMap.clear();
-					ReadHandleUI();
-
-				}catch(Exception ex)
-				{
-					Toast.makeText(MainActivity.this, MyApplication.Constr_nostopreadfailed+ex.getMessage(),
-							Toast.LENGTH_SHORT).show();
-				}
-			}
+//                startRead();
+            }
 
 		});
 
@@ -811,9 +752,101 @@ public class MainActivity extends TabActivity  {
 				}
 			}
 		});
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    Thread.sleep(500);
+                    EventBusUtils.post(new MessageEvent("sa"));
+                    Thread.sleep(500);
+                    Message mes=new Message();
+                    mes.what=4;
+                    handler2.sendMessage(mes);
+                } catch (InterruptedException e) {
+                }
+            }
+        }).start();
 	}
 
-	String[] Coname;//=new String[]{"序号","EPC ID","次数","天线","协议","RSSI","频率","附加数据"};
+    public void startRead() {
+        try{
+
+            if(Adapter==null)
+            {
+                ListMs.add(h);
+                Adapter  = new MyAdapter(getApplicationContext(),ListMs,
+                        R.layout.listitemview_inv, Coname,new int[] { R.id.textView_readsort,
+                        R.id.textView_readepc, R.id.textView_readcnt,R.id.textView_readant,
+                        R.id.textView_readpro,R.id.textView_readrssi,R.id.textView_readfre,
+                        R.id.textView_reademd});
+
+                listView.setAdapter(Adapter);
+            }
+
+            boolean bl = true;
+            if(myapp.needreconnect)
+            {
+                int c=0;
+                do{
+                    bl=reconnect();
+                    if(!bl)
+                        Toast.makeText(MainActivity.this, MyApplication.Constr_sub1recfailed,
+                                Toast.LENGTH_SHORT).show();
+                    c++;
+                    if(c>0)
+                        break;
+                }
+                while(true);
+            }
+            if(!bl)
+                return;
+
+            if(myapp.nostop)
+            {
+                READER_ERR er=myapp.Mreader.AsyncStartReading(myapp.Rparams.uants,
+                        myapp.Rparams.uants.length, myapp.Rparams.option);
+                if(er!= READER_ERR.MT_OK_ERR)
+                {	 Toast.makeText(MainActivity.this, MyApplication.Constr_nostopreadfailed,
+                        Toast.LENGTH_SHORT).show();
+                    return;
+                }
+            }
+
+            if(myapp.ThreadMODE==0)
+                handler.postDelayed(runnable_MainActivity,0);
+            else if(myapp.ThreadMODE==1)
+            {
+                if(myapp.needlisen==true)
+                //设置盘存到标签时的回调处理函数
+                { myapp.Mreader.addReadListener(RL);
+                    //*
+                    //设置读写器发生错误时的回调处理函数
+                    myapp.Mreader.addReadExceptionListener(REL);
+                    myapp.needlisen=false;
+                }
+
+                //广播形式
+                if (StartReadTags()!= READER_ERR.MT_OK_ERR)
+                {
+                    Toast.makeText(MainActivity.this, MyApplication.Constr_nostopreadfailed,
+                            Toast.LENGTH_SHORT).show();
+                    return;
+                }
+            }
+
+            myapp.TagsMap.clear();
+            ReadHandleUI();
+
+        }catch(Exception ex)
+        {
+            Toast.makeText(MainActivity.this, MyApplication.Constr_nostopreadfailed+ex.getMessage(),
+                    Toast.LENGTH_SHORT).show();
+        }
+    }
+
+
+    String[] Coname;//=new String[]{"序号","EPC ID","次数","天线","协议","RSSI","频率","附加数据"};
 
 	private void TagsBufferResh(String key,TAGINFO tfs)
 	{
@@ -988,7 +1021,7 @@ public class MainActivity extends TabActivity  {
 			} else {
 				Adapter.notifyDataSetChanged();
 			}
-
+            mText.setText("adasdad");
 			int cll = TagsMap.size();
 			if (cll < 0)
 				cll = 0;
@@ -1067,12 +1100,12 @@ public class MainActivity extends TabActivity  {
 		if(RULE_NOSELPT)
 		{
 			tw.getChildAt(1).setEnabled(false);
-			tw.getChildAt(2).setEnabled(false);
+//			tw.getChildAt(2).setEnabled(false);
 		}
 		else{
 			tw.getChildAt(0).setEnabled(false);
-			tw.getChildAt(2).setEnabled(false);
-			tw.getChildAt(3).setEnabled(false);
+//			tw.getChildAt(2).setEnabled(false);
+//			tw.getChildAt(3).setEnabled(false);
 		}
 	}
 	private void StopHandleUI()
@@ -1083,12 +1116,12 @@ public class MainActivity extends TabActivity  {
 		if(RULE_NOSELPT)
 		{
 			tw.getChildAt(1).setEnabled(true);
-			tw.getChildAt(2).setEnabled(true);
+//			tw.getChildAt(2).setEnabled(true);
 		}
 		else
 		{tw.getChildAt(0).setEnabled(true);
-			tw.getChildAt(2).setEnabled(true);
-			tw.getChildAt(3).setEnabled(true);
+//			tw.getChildAt(2).setEnabled(true);
+//			tw.getChildAt(3).setEnabled(true);
 		}
 	}
 
