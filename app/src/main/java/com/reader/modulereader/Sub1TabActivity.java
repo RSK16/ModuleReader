@@ -32,52 +32,52 @@ public class Sub1TabActivity<OpeListActivity> extends Activity {
 
 	private Button button_connect,button_disconnect;
 	TabHost tabHost_connect;
-	 
+
 	private Spinner spinner_pdatype,spinner_antports;
 	@SuppressWarnings("rawtypes")
 	private ArrayAdapter arradp_pdatype,arradp_antports;
-	
-	String[] pdatypev={"��","CW","trinea","alps-konka77_cu_ics",
+
+	String[] pdatypev={"无","CW","trinea","alps-konka77_cu_ics",
 			"alps-kt45","hd508","IDAT","JIEB","ekemp","alps-konka77_cu_ics_test",
 			"senter-st308w", "senter-st907","alps-g86","HANDH_12","armor","CZ8800","XISI","XIBA","SENTER907PDA","alps-kt45Q",
-			"Urovo_SQ31","Urovo_SQ31Q","K06SS_A","HANDH_13","SENTER907_PDA_T8939"}; 
- 
+			"Urovo_SQ31","Urovo_SQ31Q","K06SS_A","HANDH_13","SENTER907_PDA_T8939"};
+
 	String[] baudrate={"9600","19200","38400","57600","115200"};
-	 
+
 	MyApplication myapp;
-    
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.tab1_tablelayout_connect);
-		
+
 		Application app=getApplication();
-		myapp=(MyApplication) app; 
+		myapp=(MyApplication) app;
 		myapp.Mreader=new Reader();
 
 		myapp.spf=new SPconfig(this);
-		
+
 		 pdatypev[0]=MyApplication.No;
-		 
-				spinner_antports = (Spinner) findViewById(R.id.spinner_antports);       	 
-				arradp_antports = new ArrayAdapter<String>(this,android.R.layout.simple_spinner_item,MyApplication.pdaatpot); 
-				arradp_antports.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);    
+
+				spinner_antports = (Spinner) findViewById(R.id.spinner_antports);
+				arradp_antports = new ArrayAdapter<String>(this,android.R.layout.simple_spinner_item,MyApplication.pdaatpot);
+				arradp_antports.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 				spinner_antports.setAdapter(arradp_antports);
-				spinner_pdatype = (Spinner) findViewById(R.id.spinner_pdatype); 
-				 //����ѡ������ArrayAdapter��������         	 
-				arradp_pdatype = new ArrayAdapter<String>(this,android.R.layout.simple_spinner_item,pdatypev); 
-				 //���������б�ķ��       
+				spinner_pdatype = (Spinner) findViewById(R.id.spinner_pdatype);
+				//将可选内容与ArrayAdapter连接起来
+				arradp_pdatype = new ArrayAdapter<String>(this,android.R.layout.simple_spinner_item,pdatypev);
+				//设置下拉列表的风格
 				arradp_pdatype.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-				 //��adapter ��ӵ�spinner��       
+				//将adapter 添加到spinner中
 				spinner_pdatype.setAdapter(arradp_pdatype);
 
 				button_connect=(Button)findViewById(R.id.button_connect);
 				button_disconnect=(Button)findViewById(R.id.button_disconnect);
-				 
+
 				String pdatypestr=myapp.spf.GetString("PDATYPE");
 				String addressstr=myapp.spf.GetString("ADDRESS");
 				String antportstr=myapp.spf.GetString("ANTPORT");
-				 
+
 				if(!pdatypestr.equals(""))
 				{
 					spinner_pdatype.setSelection(Integer.valueOf(pdatypestr));
@@ -87,13 +87,13 @@ public class Sub1TabActivity<OpeListActivity> extends Activity {
 						et1.setText(addressstr);
 					}
 				}
-				 
+
 				if(!antportstr.equals(""))
 				{
 					spinner_antports.setSelection(Integer.valueOf(antportstr));
 				}
-				
-				//�����¼�
+
+			//窗体事件
 				button_connect.setOnClickListener(new OnClickListener()
 				{
 					@Override
@@ -101,7 +101,7 @@ public class Sub1TabActivity<OpeListActivity> extends Activity {
 						// TODO Auto-generated method stub
 						EditText et1=(EditText)findViewById(R.id.editText_adr);
 					    String  ip=et1.getText().toString();
-					    if(ip=="") 
+					    if(ip=="")
 					    {
 					    	Toast.makeText(Sub1TabActivity.this, MyApplication.Constr_sub1adrno,
 							Toast.LENGTH_SHORT).show();
@@ -111,62 +111,62 @@ public class Sub1TabActivity<OpeListActivity> extends Activity {
 					    	Toast.makeText(Sub1TabActivity.this, MyApplication.Constr_sub1pdtsl,
 									Toast.LENGTH_SHORT).show();
 					    }
-		 
+
 						boolean blen=myapp.Rpower.PowerUp();
-					  
+
 						Toast.makeText(Sub1TabActivity.this, MyApplication.Constr_mainpu+String.valueOf(blen),
 									Toast.LENGTH_SHORT).show();
 						if(!blen)
 						return;
 
 						Reader.READER_ERR er=myapp.Mreader.InitReader_Notype(ip, spinner_antports.getSelectedItemPosition()+1);
- 
+
 						if(er== Reader.READER_ERR.MT_OK_ERR)
-						{	
+						{
 							myapp.needlisen=true;
 							myapp.needreconnect=false;
 							myapp.spf.SaveString("PDATYPE", String.valueOf(spinner_pdatype.getSelectedItemPosition()));
 							myapp.spf.SaveString("ADDRESS", et1.getText().toString());
 							myapp.spf.SaveString("ANTPORT", String.valueOf(spinner_antports.getSelectedItemPosition()));
-							 
+
 							Toast.makeText(Sub1TabActivity.this, MyApplication.Constr_connectok,
 							Toast.LENGTH_SHORT).show();
-							myapp.antportc=spinner_antports.getSelectedItemPosition()+1;  
+							myapp.antportc=spinner_antports.getSelectedItemPosition()+1;
 							ConnectHandleUI();
 							myapp.Address=ip;
-						 
+
 						}
 							else
 							{
-								 
+
 								Toast.makeText(Sub1TabActivity.this, MyApplication.Constr_connectfialed+
 							    er.toString(),Toast.LENGTH_SHORT).show();
 							}
 					}
 				});
-				
+
 				button_disconnect.setOnClickListener(new OnClickListener()
 				{
 
 					@Override
 					public void onClick(View arg0) {
 						// TODO Auto-generated method stub
-						
+
 						if(myapp.Mreader!=null)
 						{
 							myapp.Mreader.CloseReader();
 							myapp.needlisen=true;
 						}
-						
+
 						boolean blen=myapp.Rpower.PowerDown();
-					 
+
 						Toast.makeText(Sub1TabActivity.this, MyApplication.Constr_disconpowdown+String.valueOf(blen),
 								Toast.LENGTH_SHORT).show();
 						DisConnectHandleUI();
 					}
-					
+
 				});
-	 
+
 				spinner_pdatype.setOnItemSelectedListener(new OnItemSelectedListener()
 				{
 
@@ -174,15 +174,15 @@ public class Sub1TabActivity<OpeListActivity> extends Activity {
 					public void onItemSelected(AdapterView<?> arg0, View arg1,
 							int arg2, long arg3) {
 						// TODO Auto-generated method stub
-					 
+
 						RfidPower.PDATYPE PT= RfidPower.PDATYPE.valueOf(arg2);
 						myapp.Rpower=new RfidPower(PT);
 						if(PT!= RfidPower.PDATYPE.NONE)
 						{EditText et1=(EditText)findViewById(R.id.editText_adr);
 					    et1.setText(myapp.Rpower.GetDevPath());
- 
+
 						}
-						
+
 						//*
 						String  mod = android.os.Build.MODEL;
 						Toast.makeText(Sub1TabActivity.this, mod,
@@ -197,14 +197,14 @@ public class Sub1TabActivity<OpeListActivity> extends Activity {
 					@Override
 					public void onNothingSelected(AdapterView<?> arg0) {
 						// TODO Auto-generated method stub
-						
+
 					}
-					
+
 				});
-				InputMethodManager inputMethodManager = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);  
-				  
-				inputMethodManager.hideSoftInputFromWindow(Sub1TabActivity.this.getCurrentFocus().getWindowToken(),  
-				  
+				InputMethodManager inputMethodManager = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
+
+				inputMethodManager.hideSoftInputFromWindow(Sub1TabActivity.this.getCurrentFocus().getWindowToken(),
+
 				InputMethodManager.HIDE_NOT_ALWAYS);
 	}
 	private void ConnectHandleUI()
@@ -213,30 +213,30 @@ public class Sub1TabActivity<OpeListActivity> extends Activity {
 		{
 			Reader.READER_ERR er;
 			myapp.Rparams=myapp.spf.ReadReaderParams();
-			
+
 			 if(myapp.Rparams.invpro.size()<1)
 				 myapp.Rparams.invpro.add("GEN2");
-		   
+
 		    	 List<Reader.SL_TagProtocol> ltp=new ArrayList<Reader.SL_TagProtocol>();
 				   for(int i=0;i<myapp.Rparams.invpro.size();i++)
 				   {  if(myapp.Rparams.invpro.get(i).equals("GEN2"))
 				    	{ ltp.add(Reader.SL_TagProtocol.SL_TAG_PROTOCOL_GEN2);
-				    	 
+
 				    	}
 				   else if(myapp.Rparams.invpro.get(i).equals("6B"))
 				    	{
 				    	  ltp.add(Reader.SL_TagProtocol.SL_TAG_PROTOCOL_ISO180006B);
-				    	 
+
 				    	}
 				   else if(myapp.Rparams.invpro.get(i).equals("IPX64"))
 				    	{
 				    	   ltp.add(Reader.SL_TagProtocol.SL_TAG_PROTOCOL_IPX64);
-				    	   
+
 				    	}
 				   else if(myapp.Rparams.invpro.get(i).equals("IPX256"))
 				    	{
 				    	  ltp.add(Reader.SL_TagProtocol.SL_TAG_PROTOCOL_IPX256);
-				    	  
+
 				    	}
 				   }
 
@@ -251,10 +251,10 @@ public class Sub1TabActivity<OpeListActivity> extends Activity {
 						ipl.potl=stp[i];
 						ipst.potls[0]=ipl;
 					}
-					
+
 				  er=myapp.Mreader.ParamSet(Reader.Mtr_Param.MTR_PARAM_TAG_INVPOTL, ipst);
 			      Log.d("MYINFO", "Connected set pro:"+er.toString());
-	 
+
 			 er=myapp.Mreader.ParamSet(Reader.Mtr_Param.MTR_PARAM_READER_IS_CHK_ANT,
 					 new int[]{myapp.Rparams.checkant});
 			 Log.d("MYINFO", "Connected set checkant:"+er.toString());
@@ -268,9 +268,9 @@ public class Sub1TabActivity<OpeListActivity> extends Activity {
 					jaap.antid=i+1;
 					jaap.readPower =(short)myapp.Rparams.rpow[i];
 					jaap.writePower=(short)myapp.Rparams.wpow[i];
-					apcf.Powers[i]=jaap; 
+					apcf.Powers[i]=jaap;
 				}
-				
+
 			myapp.Mreader.ParamSet(Reader.Mtr_Param.MTR_PARAM_RF_ANTPOWER, apcf);
 
 			Reader.Region_Conf rre;
@@ -303,7 +303,7 @@ public class Sub1TabActivity<OpeListActivity> extends Activity {
 			 {
 				 er=myapp.Mreader.ParamSet(Reader.Mtr_Param.MTR_PARAM_FREQUENCY_REGION,rre);
 			 }
-  
+
 			if(myapp.Rparams.frelen>0)
 			{
 
@@ -313,7 +313,7 @@ public class Sub1TabActivity<OpeListActivity> extends Activity {
 					  er=myapp.Mreader.ParamSet
 							(Reader.Mtr_Param.MTR_PARAM_FREQUENCY_HOPTABLE,hdst);
 			}
-			 
+
 			er=myapp.Mreader.ParamSet(Reader.Mtr_Param.MTR_PARAM_POTL_GEN2_SESSION,
 							new int[]{myapp.Rparams.session});
 			er=myapp.Mreader.ParamSet(Reader.Mtr_Param.MTR_PARAM_POTL_GEN2_Q,
@@ -324,7 +324,7 @@ public class Sub1TabActivity<OpeListActivity> extends Activity {
 					new int[]{myapp.Rparams.maxlen});
 			er=myapp.Mreader.ParamSet(Reader.Mtr_Param.MTR_PARAM_POTL_GEN2_TARGET,
 					new int[]{myapp.Rparams.target});
-			 
+
 			if(myapp.Rparams.filenable==1)
 			{
 				Reader.TagFilter_ST tfst=myapp.Mreader.new TagFilter_ST();
@@ -335,24 +335,24 @@ public class Sub1TabActivity<OpeListActivity> extends Activity {
 				 tfst.flen=tfst.fdata.length*8;
 				 tfst.startaddr=myapp.Rparams.filadr;
 				 tfst.isInvert=myapp.Rparams.filisinver;
-		       
+
 				 myapp.Mreader.ParamSet(Reader.Mtr_Param.MTR_PARAM_TAG_FILTER, tfst);
 			}
-		 
+
 			if(myapp.Rparams.emdenable==1)
 			{
 				Reader.EmbededData_ST edst = myapp.Mreader.new EmbededData_ST();
-				 
+
 				edst.accesspwd=null;
 				edst.bank=myapp.Rparams.emdbank;
 				edst.startaddr=myapp.Rparams.emdadr;
 				edst.bytecnt=myapp.Rparams.emdbytec;
 				edst.accesspwd=null;
-			 
+
 				er=myapp.Mreader.ParamSet(Reader.Mtr_Param.MTR_PARAM_TAG_EMBEDEDDATA,
 						edst);
 			}
-			 
+
 			er=myapp.Mreader.ParamSet
 					(Reader.Mtr_Param.MTR_PARAM_TAGDATA_UNIQUEBYEMDDATA,
 							new int[]{myapp.Rparams.adataq});
@@ -362,7 +362,7 @@ public class Sub1TabActivity<OpeListActivity> extends Activity {
 			er=myapp.Mreader.ParamSet
 					(Reader.Mtr_Param.MTR_PARAM_TAG_SEARCH_MODE,
 							new int[]{myapp.Rparams.invw});
-			
+
 			TextView tv_module=(TextView)findViewById(R.id.textView_module);
 
 			Reader.HardwareDetails val=myapp.Mreader.new HardwareDetails();
@@ -371,7 +371,7 @@ public class Sub1TabActivity<OpeListActivity> extends Activity {
 			{
 				tv_module.setText(val.module.toString());
 			}
-		 
+
 		}catch(Exception ex)
 		{
 			Log.d("MYINFO", ex.getMessage()+ex.toString()+ex.getStackTrace());
@@ -397,15 +397,15 @@ public class Sub1TabActivity<OpeListActivity> extends Activity {
 	}
 	@Override
 	public boolean onKeyDown(int keyCode, KeyEvent event) {
-	    if(keyCode == KeyEvent.KEYCODE_BACK && event.getAction() == KeyEvent.ACTION_DOWN){   
-	        if((System.currentTimeMillis()-myapp.exittime) > 2000){  
-	            Toast.makeText(getApplicationContext(), MyApplication.Constr_Putandexit, Toast.LENGTH_SHORT).show();                                
-	            myapp.exittime = System.currentTimeMillis();   
+	    if(keyCode == KeyEvent.KEYCODE_BACK && event.getAction() == KeyEvent.ACTION_DOWN){
+	        if((System.currentTimeMillis()-myapp.exittime) > 2000){
+	            Toast.makeText(getApplicationContext(), MyApplication.Constr_Putandexit, Toast.LENGTH_SHORT).show();
+	            myapp.exittime = System.currentTimeMillis();
 	        } else {
 	            finish();
 	           // System.exit(0);
 	        }
-	        return true;   
+	        return true;
 	    }
 	    return super.onKeyDown(keyCode, event);
 	}

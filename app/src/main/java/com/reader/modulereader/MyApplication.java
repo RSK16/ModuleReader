@@ -15,6 +15,16 @@ import java.util.Map;
 
 public class MyApplication extends Application{
 
+	private static MyApplication mDDApplication;
+
+	/**
+	 * 获取Application对象
+	 *
+	 * @return DDApplication
+	 */
+	public static MyApplication getInstance() {
+		return mDDApplication;
+	}
 	//常量
 	//*
 	public static String Constr_READ = "读";
