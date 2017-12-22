@@ -27,6 +27,7 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.Button;
 import android.widget.ExpandableListView;
+import android.widget.GridView;
 import android.widget.ListView;
 import android.widget.TabHost;
 import android.widget.TabHost.OnTabChangeListener;
@@ -101,6 +102,9 @@ public class MainActivity extends TabActivity  {
 	MyAdapter Adapter;
 	Map<String, String> h = new HashMap<String, String>();
     private TextView mText;
+	private GridView glList1;
+    private BookAdapter bookAdapter1;
+    private ArrayList<String> bookList = new ArrayList<>();
 
     public class MyBroadcastReceiver extends BroadcastReceiver {
 		public static final String TAG = "MyBroadcastReceiver";
@@ -508,6 +512,9 @@ public class MainActivity extends TabActivity  {
 
 		Awl.WakeLock();
 		tabHost = (TabHost) findViewById(android.R.id.tabhost);
+        bookAdapter1 = new BookAdapter(bookList, this);
+        glList1 = (GridView) findViewById(R.id.gl_list1);
+		glList1.setAdapter(bookAdapter1);
 		tabHost.setup();
 
 		if(RULE_NOSELPT)
@@ -611,92 +618,92 @@ public class MainActivity extends TabActivity  {
 			}
 		});
 
-		button_read.setOnClickListener(new OnClickListener()
-		{
-			@Override
-			public void onClick(View arg0) {
-				// TODO Auto-generated method stub
-//                startRead();
-            }
+//		button_read.setOnClickListener(new OnClickListener()
+//		{
+//			@Override
+//			public void onClick(View arg0) {
+//				// TODO Auto-generated method stub
+////                startRead();
+//            }
+//
+//		});
 
-		});
+//		button_stop.setOnClickListener(new OnClickListener()
+//		{
+//
+//			@Override
+//			public void onClick(View arg0) {
+//				// TODO Auto-generated method stub
+//
+//				if (myapp.nostop) {
+//					Log.d("MYINFO", "stop---");
+//					READER_ERR er = myapp.Mreader.AsyncStopReading();
+//					if (er != READER_ERR.MT_OK_ERR) {
+//						Toast.makeText(MainActivity.this, MyApplication.Constr_nostopspreadfailed,
+//								Toast.LENGTH_SHORT).show();
+//						return;
+//					}
+//				}
+//
+//				if (myapp.ThreadMODE == 0)
+//					handler.removeCallbacks(runnable_MainActivity);
+//				else if (myapp.ThreadMODE == 1){
+//					if (myapp.Mreader.StopReading() != READER_ERR.MT_OK_ERR)
+//					{
+//						Toast.makeText(MainActivity.this, MyApplication.Constr_nostopspreadfailed,
+//								Toast.LENGTH_SHORT).show();
+//						return;
+//					}
+//				}
+//
+//				if (myapp.Rpower.GetType() == PDATYPE.SCAN_ALPS_ANDROID_CUIUS2) {
+//					try {
+//						Thread.sleep(500);
+//					} catch (InterruptedException e) {
+//						// TODO Auto-generated catch block
+//						e.printStackTrace();
+//					}
+//				}
+//
+//				Awl.ReleaseWakeLock();
+//				autostop = false;
+//
+//				myapp.TagsMap.putAll(TagsMap);
+//				StopHandleUI();
+//
+//			}
+//
+//		});
 
-		button_stop.setOnClickListener(new OnClickListener()
-		{
-
-			@Override
-			public void onClick(View arg0) {
-				// TODO Auto-generated method stub
-
-				if (myapp.nostop) {
-					Log.d("MYINFO", "stop---");
-					READER_ERR er = myapp.Mreader.AsyncStopReading();
-					if (er != READER_ERR.MT_OK_ERR) {
-						Toast.makeText(MainActivity.this, MyApplication.Constr_nostopspreadfailed,
-								Toast.LENGTH_SHORT).show();
-						return;
-					}
-				}
-
-				if (myapp.ThreadMODE == 0)
-					handler.removeCallbacks(runnable_MainActivity);
-				else if (myapp.ThreadMODE == 1){
-					if (myapp.Mreader.StopReading() != READER_ERR.MT_OK_ERR)
-					{
-						Toast.makeText(MainActivity.this, MyApplication.Constr_nostopspreadfailed,
-								Toast.LENGTH_SHORT).show();
-						return;
-					}
-				}
-
-				if (myapp.Rpower.GetType() == PDATYPE.SCAN_ALPS_ANDROID_CUIUS2) {
-					try {
-						Thread.sleep(500);
-					} catch (InterruptedException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-				}
-
-				Awl.ReleaseWakeLock();
-				autostop = false;
-
-				myapp.TagsMap.putAll(TagsMap);
-				StopHandleUI();
-
-			}
-
-		});
-
-		button_clear.setOnClickListener(new OnClickListener()
-		{
-
-			@Override
-			public void onClick(View arg0) {
-				// TODO Auto-generated method stub
-				if(Adapter!=null)
-				{
-					TagsMap.clear();
-					myapp.TagsMap.clear();
-					ListMs.clear();
-					// showlist();
-
-					ListMs.add(h);
-					Adapter.notifyDataSetChanged();
-				}
-
-				TextView et=(TextView)findViewById(R.id.textView_readoncecnt);
-				et.setText("0");
-
-				TextView et2=(TextView)findViewById(R.id.textView_readallcnt);
-				et2.setText("0");
-
-				TextView et3=(TextView)findViewById(R.id.textView_invstate);
-				et3.setText("...");
-
-				myapp.Curepc="";
-			}
-		});
+//		button_clear.setOnClickListener(new OnClickListener()
+//		{
+//
+//			@Override
+//			public void onClick(View arg0) {
+//				// TODO Auto-generated method stub
+//				if(Adapter!=null)
+//				{
+//					TagsMap.clear();
+//					myapp.TagsMap.clear();
+//					ListMs.clear();
+//					// showlist();
+//
+//					ListMs.add(h);
+//					Adapter.notifyDataSetChanged();
+//				}
+//
+//				TextView et=(TextView)findViewById(R.id.textView_readoncecnt);
+//				et.setText("0");
+//
+//				TextView et2=(TextView)findViewById(R.id.textView_readallcnt);
+//				et2.setText("0");
+//
+//				TextView et3=(TextView)findViewById(R.id.textView_invstate);
+//				et3.setText("...");
+//
+//				myapp.Curepc="";
+//			}
+//		});
 
 		this.listView.setOnItemClickListener(new OnItemClickListener(){
 
@@ -864,6 +871,7 @@ public class MainActivity extends TabActivity  {
 				epcstr = String.format("%-24s", epcstr);
 
 			m.put(Coname[1], epcstr);
+            bookList.add(epcstr);//增加数据
 			String cs = m.get("次数");
 			if (cs == null)
 				cs = "0";
@@ -1020,8 +1028,8 @@ public class MainActivity extends TabActivity  {
 				tag = new String[0];
 			} else {
 				Adapter.notifyDataSetChanged();
+                bookAdapter1.notifyDataSetChanged();
 			}
-            mText.setText("adasdad");
 			int cll = TagsMap.size();
 			if (cll < 0)
 				cll = 0;
