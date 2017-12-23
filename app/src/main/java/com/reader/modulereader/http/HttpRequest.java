@@ -1,6 +1,11 @@
 package com.reader.modulereader.http;
 
 
+import com.reader.modulereader.entity.OrderDetails;
+import com.reader.modulereader.entity.PayInfo;
+import com.reader.modulereader.entity.Response;
+
+import rx.Observable;
 
 /**
  * 创建者：     金国栋      <br/><br/>
@@ -34,4 +39,16 @@ public class HttpRequest {
 	}
 
 
+	/**
+	 * 获取商家支付信息
+	 * @param shop_id
+	 * @return
+	 */
+	public Observable<PayInfo> getPayInfos(String shop_id) {
+		return mApiService.getPayInfos(shop_id);
+	}
+
+	public Observable<Response<OrderDetails>> getOrderDetail(int order_id) {
+		return mApiService.getOrderDetail(order_id);
+	}
 }

@@ -21,7 +21,6 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
@@ -38,11 +37,16 @@ import android.widget.Toast;
 
 import com.pow.api.cls.RfidPower;
 import com.pow.api.cls.RfidPower.PDATYPE;
+import com.reader.modulereader.entity.OrderDetails;
+import com.reader.modulereader.entity.PayInfo;
+import com.reader.modulereader.exception.ApiHttpException;
 import com.reader.modulereader.function.AndroidWakeLock;
 import com.reader.modulereader.function.MyAdapter;
 import com.reader.modulereader.function.MyEpListAdapter;
 import com.reader.modulereader.function.SPconfig;
 import com.reader.modulereader.function.ScreenListener;
+import com.reader.modulereader.mvp.MainContract;
+import com.reader.modulereader.mvp.MainPresenter;
 import com.reader.modulereader.utils.EventBusUtils;
 import com.reader.modulereader.utils.MessageEvent;
 import com.reader.modulereader.utils.ToastUtil;
@@ -65,9 +69,6 @@ import com.uhf.api.cls.Reader.SL_TagProtocol;
 import com.uhf.api.cls.Reader.TAGINFO;
 import com.uhf.api.cls.Reader.TagFilter_ST;
 
-import org.greenrobot.eventbus.Subscribe;
-import org.greenrobot.eventbus.ThreadMode;
-
 import java.io.DataOutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -77,7 +78,7 @@ import java.util.Locale;
 import java.util.Map;
 
 @SuppressWarnings("deprecation")
-public class MainActivity extends TabActivity  {
+public class MainActivity<P extends MainContract.IMainPresenter> extends TabActivity implements MainContract.IMainView {
 
 	ExpandableListView tab4_left,tab4_right;
 	TextView tv_once,tv_state,tv_tags,tv_costt;
@@ -105,8 +106,58 @@ public class MainActivity extends TabActivity  {
 	private GridView glList1;
     private BookAdapter bookAdapter1;
     private ArrayList<String> bookList = new ArrayList<>();
+	private MainContract.IMainPresenter presenter;
+	private TextView text;
 
-    public class MyBroadcastReceiver extends BroadcastReceiver {
+	@Override
+	public void showView(int viewState) {
+
+	}
+
+	protected void setPresenter() {
+		presenter = new MainPresenter(this);
+	}
+
+	public MainContract.IMainPresenter getPresenter() {
+		return presenter;
+	}
+
+	@Override
+	public void showView(int viewState, ApiHttpException e) {
+
+	}
+
+	@Override
+	public void getBookSuccess() {
+
+	}
+
+	@Override
+	public void getBookError(ApiHttpException e) {
+
+	}
+
+	@Override
+	public void getPayInfosSuccess(PayInfo payInfoList) {
+		text.setText(payInfoList.ret_msg);
+	}
+
+	@Override
+	public void getPayInfosError(ApiHttpException e) {
+		ToastUtil.toastS(e.getMessage());
+	}
+
+	@Override
+	public void getOrderDetailSuccess(OrderDetails orderDetails) {
+		text.setText(orderDetails.ret_msg);
+	}
+
+	@Override
+	public void getOrderDetailError(ApiHttpException e) {
+		ToastUtil.toastS(e.getMessage());
+	}
+
+	public class MyBroadcastReceiver extends BroadcastReceiver {
 		public static final String TAG = "MyBroadcastReceiver";
 		@Override
 		public void onReceive(Context context, Intent intent) {
@@ -513,9 +564,10 @@ public class MainActivity extends TabActivity  {
 		Awl.WakeLock();
 		tabHost = (TabHost) findViewById(android.R.id.tabhost);
         bookAdapter1 = new BookAdapter(bookList, this);
-        glList1 = (GridView) findViewById(R.id.gl_list1);
-		glList1.setAdapter(bookAdapter1);
+//        glList1 = (GridView) findViewById(R.id.gl_list1);
+//		glList1.setAdapter(bookAdapter1);
 		tabHost.setup();
+		setPresenter();
 
 		if(RULE_NOSELPT)
 			;
@@ -569,6 +621,8 @@ public class MainActivity extends TabActivity  {
 		tv_state=(TextView)findViewById(R.id.textView_invstate);
 		tv_tags=(TextView)findViewById(R.id.textView_readallcnt);
 		tv_costt=(TextView)findViewById(R.id.textView_costtime);
+		text=(TextView)findViewById(R.id.text);
+		text.setOnClickListener(view ->getPresenter().getOrderDetail(396370) );
 		for (int i = 0; i < Coname.length; i++)
 			h.put(Coname[i], Coname[i]);
 		myapp.needreconnect=false;
@@ -1146,6 +1200,8 @@ public class MainActivity extends TabActivity  {
 		unregisterReceiver(mBroadcastReceiver);
 		System.exit(0);
 		super.onDestroy();
+		if (presenter != null)
+			presenter.detachView();
 	}
 
 	@Override

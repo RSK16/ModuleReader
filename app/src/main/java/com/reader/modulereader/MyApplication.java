@@ -3,8 +3,10 @@ package com.reader.modulereader;
 import android.app.Application;
 import android.widget.TabHost;
 
+import com.blankj.utilcode.util.Utils;
 import com.pow.api.cls.RfidPower;
 import com.reader.modulereader.function.SPconfig;
+import com.reader.modulereader.http.CrashHandler;
 import com.uhf.api.cls.Reader;
 import com.uhf.api.cls.Reader.TAGINFO;
 
@@ -24,6 +26,23 @@ public class MyApplication extends Application{
 	 */
 	public static MyApplication getInstance() {
 		return mDDApplication;
+	}
+
+	@Override
+	public void onCreate() {
+		super.onCreate();
+		mDDApplication = this;
+		initUtils();
+		initCrashHandler();
+	}
+	private void initUtils() {
+		Utils.init(this);
+	}
+	/**
+	 * Crash处理
+	 */
+	private void initCrashHandler() {
+		CrashHandler.getInstance().init(this);
 	}
 	//常量
 	//*

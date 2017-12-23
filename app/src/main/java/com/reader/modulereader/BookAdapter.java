@@ -1,7 +1,6 @@
 package com.reader.modulereader;
 
 import android.content.Context;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
@@ -46,21 +45,21 @@ public class BookAdapter extends BaseAdapter {
 
         if (convertView == null) {
 
-            viewHolder = new ViewHolder();
-            // 获得容器
-            convertView = LayoutInflater.from(this.context).inflate(R.layout.book, null);
-
-            // 初始化组件
-            viewHolder.title = (TextView) convertView.findViewById(R.id.title);
-            // 给converHolder附加一个对象
-            convertView.setTag(viewHolder);
+//            viewHolder = new ViewHolder();
+//            // 获得容器
+//            convertView = LayoutInflater.from(this.context).inflate(R.layout.book, null);
+//
+//            // 初始化组件
+//            viewHolder.title = (TextView) convertView.findViewById(R.id.title);
+//            // 给converHolder附加一个对象
+//            convertView.setTag(viewHolder);
         } else {
             // 取得converHolder附加的对象
             viewHolder = (ViewHolder) convertView.getTag();
         }
 
 
-        viewHolder.title.setText(titles.get(position));
+//        viewHolder.title.setText(titles.get(position));
 
         return convertView;
     }

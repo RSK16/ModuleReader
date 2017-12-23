@@ -1,9 +1,10 @@
 package com.reader.modulereader.http;
 
 
-import java.util.List;
+import com.reader.modulereader.entity.OrderDetails;
+import com.reader.modulereader.entity.PayInfo;
+import com.reader.modulereader.entity.Response;
 
-import retrofit2.Response;
 import retrofit2.http.GET;
 import retrofit2.http.Query;
 import rx.Observable;
@@ -15,17 +16,24 @@ import rx.Observable;
  */
 
 public interface ApiService {
-	//	获取打印机列表
-	String PRINTER_LIST = "printerConfig/queryPrinterListByShopId";
 
+	String GETPAYINFOS = "paytype/getInfos"; //接口用于获取支付方式
+
+	//	获取订单详情
+	String GETORDER_DETAILS = "order/getOrderDetail";
+	/**
+	 * 获取商家支付信息
+	 * @param shop_id
+	 * @return
+	 */
+	@GET(GETPAYINFOS)
+	Observable<PayInfo> getPayInfos(@Query("shop_id") String shop_id);
 
 	/**
-	 * 获取打印机列表
+	 * 获取订单详情
 	 *
-	 * @param shop_id
+	 * @param order_id 订单号
 	 */
-	@GET(PRINTER_LIST)
-	Observable<Response<List<String>>> getPrinterList(@Query("shop_id") int shop_id);
-
-
+	@GET(GETORDER_DETAILS)
+	Observable<Response<OrderDetails>> getOrderDetail(@Query("order_id") int order_id);
 }
