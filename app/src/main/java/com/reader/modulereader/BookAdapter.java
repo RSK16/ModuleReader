@@ -1,10 +1,13 @@
 package com.reader.modulereader;
 
 import android.content.Context;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
+
+import com.reader.modulereader.entity.Course;
 
 import java.util.List;
 
@@ -14,10 +17,10 @@ import java.util.List;
 
 public class BookAdapter extends BaseAdapter {
 
-    private List<String> titles;
+    private List<Course.CourseBean> titles;
     private final Context context;
 
-    public BookAdapter(List<String> titles, Context context) {
+    public BookAdapter(List<Course.CourseBean> titles, Context context) {
         super();
         this.titles = titles;
         this.context = context;
@@ -45,21 +48,28 @@ public class BookAdapter extends BaseAdapter {
 
         if (convertView == null) {
 
-//            viewHolder = new ViewHolder();
-//            // 获得容器
-//            convertView = LayoutInflater.from(this.context).inflate(R.layout.book, null);
-//
-//            // 初始化组件
-//            viewHolder.title = (TextView) convertView.findViewById(R.id.title);
-//            // 给converHolder附加一个对象
-//            convertView.setTag(viewHolder);
+            viewHolder = new ViewHolder();
+            // 获得容器
+            convertView = LayoutInflater.from(this.context).inflate(R.layout.book, null);
+
+            // 初始化组件
+            viewHolder.title = (TextView) convertView.findViewById(R.id.title);
+            if (titles.get(position).readed) {
+                viewHolder.title.setBackgroundResource(R.drawable.textview_round_border_green);
+                viewHolder.title.setTextColor(MyApplication.getInstance().getResources().getColor(R.color.green));
+            } else {
+                viewHolder.title.setBackgroundResource(R.drawable.textview_round_border_red);
+                viewHolder.title.setTextColor(MyApplication.getInstance().getResources().getColor(R.color.red));
+            }
+            // 给converHolder附加一个对象
+            convertView.setTag(viewHolder);
         } else {
             // 取得converHolder附加的对象
             viewHolder = (ViewHolder) convertView.getTag();
         }
 
 
-//        viewHolder.title.setText(titles.get(position));
+        viewHolder.title.setText(titles.get(position).title);
 
         return convertView;
     }

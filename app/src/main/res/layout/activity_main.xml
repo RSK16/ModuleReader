@@ -69,14 +69,57 @@
         </LinearLayout>
     </TabHost>
     <LinearLayout
-        android:background="@color/colorAccent"
+        android:padding="10dp"
+        android:orientation="vertical"
+        android:background="@color/white"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
-        <TextView
-            android:id="@+id/text"
-            android:text="saassaa"
-            android:textColor="@color/black"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+        <LinearLayout
+            android:layout_gravity="center_horizontal"
+            android:background="@drawable/textview_round_border_black"
+            android:orientation="vertical"
+            android:layout_width="780dp"
+            android:layout_height="match_parent">
+            <GridView
+                android:layout_weight="1"
+                android:padding="10dp"
+                android:id="@+id/gl_list1"
+                android:numColumns="6"
+                android:layout_width="780dp"
+                android:layout_height="0dp"/>
+            <View
+                android:background="@color/green"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"/>
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="660dp"
+                android:layout_height="100dp">
+                <TextView
+                    android:gravity="center"
+                    android:padding="13dp"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_margin="10dp"
+                    android:id="@+id/notice_time"
+                    android:textColor="@color/black"
+                    android:textSize="20sp"
+                    android:text="2017-10-19"
+                    android:layout_width="wrap_content"
+                    android:layout_height="100dp" />
+                <TextView
+                    android:layout_weight="1"
+                    android:gravity="center_vertical"
+                    android:padding="13dp"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_margin="10dp"
+                    android:id="@+id/notice_text"
+                    android:textColor="@color/black"
+                    android:textSize="20sp"
+                    android:text="班主任通知：明天有活动"
+                    android:layout_width="0dp"
+                    android:layout_height="100dp" />
+            </LinearLayout>
+
+        </LinearLayout>
     </LinearLayout>
 </FrameLayout>

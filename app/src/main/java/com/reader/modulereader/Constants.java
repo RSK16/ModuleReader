@@ -15,7 +15,7 @@ public interface Constants {
 	long SHOW_VIEW_OFFSET = 500;
 	String LOG_DIR_NAME = "dd_error_log";
 	File PATH_CACHE = new File(MyApplication.getInstance().getCacheDir(), "dd_cache");
-	String BASE_URL = "http://dev.diandianwaimai.com:8887/dd_next_pos/";
+	String BASE_URL = "http://119.29.166.18:8080/fullCalendar4Java/";
 
 	interface SP {
 		String SP_FILE_NAME = "dd_pos";

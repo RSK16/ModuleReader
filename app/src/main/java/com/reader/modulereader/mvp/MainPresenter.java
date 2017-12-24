@@ -1,7 +1,10 @@
 package com.reader.modulereader.mvp;
 
+import com.reader.modulereader.entity.Course;
+import com.reader.modulereader.entity.Notice;
 import com.reader.modulereader.entity.OrderDetails;
 import com.reader.modulereader.entity.PayInfo;
+import com.reader.modulereader.entity.Response;
 import com.reader.modulereader.exception.ApiHttpException;
 import com.reader.modulereader.http.HttpRequest;
 import com.reader.modulereader.http.HttpSubscriber;
@@ -26,28 +29,23 @@ public class MainPresenter extends RxPresenter<MainContract.IMainView> implement
     }
 
     @Override
-    public void getBook() {
-
-    }
-
-    @Override
-    public void getPayInfos() {
-        HttpSubscriber<PayInfo> subscriber = new HttpSubscriber<PayInfo>() {
+    public void getNoticeJsonServlet() {
+        HttpSubscriber<Notice> subscriber = new HttpSubscriber<Notice>() {
             @Override
             protected void onError(ApiHttpException exception) {
-                view.getPayInfosError(exception);
+                view.getNoticeJsonServletError(exception);
             }
 
             @Override
-            public void onNext(PayInfo payInfo) {
-                if (payInfo.ret_code == 0) {
-                    view.getPayInfosSuccess(payInfo);
+            public void onNext(Notice notice) {
+                if ("true".equals(notice.re_tsg)) {
+                    view.getNoticeJsonServletSuccess(notice);
                 } else {
-                    onError(new ApiHttpException(payInfo.ret_msg,payInfo.ret_code));
+                    onError(new ApiHttpException("接口请求失败",-1));
                 }
             }
         };
-        HttpRequest.getInstance().getPayInfos("20826")
+        HttpRequest.getInstance().getNoticeJsonServlet()
                 .compose(RxUtil.rxSchedulerHelper())
                 .subscribe(subscriber);
 
@@ -55,28 +53,47 @@ public class MainPresenter extends RxPresenter<MainContract.IMainView> implement
     }
 
     @Override
-    public void getOrderDetail(int order_id) {
-        HttpSubscriber<OrderDetails> httpSubscriber = new HttpSubscriber<OrderDetails>() {
+    public void getCourseJsonServlet() {
+        HttpSubscriber<Course> subscriber = new HttpSubscriber<Course>() {
             @Override
             protected void onError(ApiHttpException exception) {
-                view.getOrderDetailError(exception);
+                view.getCourseJsonServletError(exception);
             }
 
             @Override
-            public void onNext(OrderDetails info) {
-                if (info != null && info.ret_code == 0) {
-                    view.getOrderDetailSuccess(info);
+            public void onNext(Course course) {
+                if ("true".equals(course.re_tsg)) {
+                    view.getCourseJsonServletSuccess(course);
                 } else {
-                    view.getOrderDetailError(new ApiHttpException(info.ret_msg, info.ret_code));
+                    onError(new ApiHttpException("接口请求失败",-1));
                 }
             }
         };
-        HttpRequest.reSet();
-        HttpRequest.getInstance().getOrderDetail(order_id)
+        HttpRequest.getInstance().getCourseJsonServlet()
                 .compose(RxUtil.rxSchedulerHelper())
-                .compose(RxUtil.handleResult())
-                .subscribe(httpSubscriber);
+                .subscribe(subscriber);
 
-        addSubscribe(httpSubscriber);
+        addSubscribe(subscriber);
     }
+
+    @Override
+    public void addlnglatJsonServlet(String lng, String lat) {
+        HttpSubscriber<Response> subscriber = new HttpSubscriber<Response>() {
+            @Override
+            protected void onError(ApiHttpException exception) {
+                view.getCourseJsonServletError(exception);
+            }
+
+            @Override
+            public void onNext(Response response ) {
+
+            }
+        };
+        HttpRequest.getInstance().addlnglatJsonServlet(lng,lat)
+                .compose(RxUtil.rxSchedulerHelper())
+                .subscribe(subscriber);
+
+        addSubscribe(subscriber);
+    }
+
 }

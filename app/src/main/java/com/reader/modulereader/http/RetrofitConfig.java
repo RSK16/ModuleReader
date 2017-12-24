@@ -58,66 +58,6 @@ public class RetrofitConfig {
 	private void initOkhttp() {
 
 		OkHttpClient.Builder builder = new OkHttpClient.Builder();
-
-		Cache cache = new Cache(Constants.PATH_CACHE, CACHE_MAX_SIZE);
-
-		Interceptor cacheInterceptor = chain -> {
-			Request request = chain.request();
-			if (!NetworkUtils.isConnected()) {
-				request = request.newBuilder()
-						.cacheControl(CacheControl.FORCE_CACHE)
-						.build();
-			}
-			Response response = chain.proceed(request);
-			if (!NetworkUtils.isConnected()) {
-				int maxAge = 0;
-				// 有网络时, 不使用缓存, 最大保存时长为0
-				response.newBuilder()
-						.header("Cache-Control", "public, max-age=" + maxAge)
-						.removeHeader("Pragma")
-						.build();
-			} else {
-				// 无网络时，设置缓存超时为2周
-				int maxStale = 60 * 60 * 24 * 14;
-				response.newBuilder()
-						.header("Cache-Control", "public, only-if-cached, max-stale=" + maxStale)
-						.removeHeader("Pragma")
-						.build();
-			}
-			return response;
-		};
-
-		//每个请求都添加shopId
-		Interceptor token = chain -> {
-
-			Request request = chain.request();
-
-			//			String shopId = User.getUserConfig().shop_id;
-
-			HttpUrl originalHttpUrl = request.url();
-
-			HttpUrl.Builder urlBuild = originalHttpUrl.newBuilder();
-			/*if (!StringUtil.isEmpty(shopId) && User.getUserConfig().isLogin) {    //判断是否登录过
-				urlBuild.addQueryParameter(User.SHOP_ID, shopId); //登录过的话就统一在请求中加入shop_id
-				urlBuild.addQueryParameter("version", AppUtils.getAppVersionCode() + ""); //版本标示
-				urlBuild.addQueryParameter("system_version", String.valueOf(Build.VERSION.SDK_INT)); //设备系统版本号
-			}*/
-
-			HttpUrl url = urlBuild.build();
-
-			LogUtil.i("requestUrl>>>" + url);
-		  /*  request = request.newBuilder()
-					.addHeader(StringUtil.isEmpty(shopId) ? "" : "shop_id", shopId)
-                    .build();*/
-
-			Request.Builder requestBuilder = request.newBuilder()
-					.url(url);
-			return chain.proceed(requestBuilder.build());
-		};
-		builder.addNetworkInterceptor(cacheInterceptor);
-		builder.addInterceptor(cacheInterceptor);
-		builder.addInterceptor(token);
-		builder.cache(cache);
 		//设置超时
 		builder.connectTimeout(TIMEOUT, TimeUnit.MILLISECONDS);
 		builder.readTimeout(READ_TIMEOUT, TimeUnit.MILLISECONDS);

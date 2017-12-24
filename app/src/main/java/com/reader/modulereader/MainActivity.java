@@ -1,19 +1,24 @@
 package com.reader.modulereader;
 
+import android.Manifest;
 import android.app.Application;
 import android.app.TabActivity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.location.Criteria;
+import android.location.LocationManager;
 import android.media.AudioManager;
 import android.media.SoundPool;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.os.PowerManager;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -37,6 +42,8 @@ import android.widget.Toast;
 
 import com.pow.api.cls.RfidPower;
 import com.pow.api.cls.RfidPower.PDATYPE;
+import com.reader.modulereader.entity.Course;
+import com.reader.modulereader.entity.Notice;
 import com.reader.modulereader.entity.OrderDetails;
 import com.reader.modulereader.entity.PayInfo;
 import com.reader.modulereader.exception.ApiHttpException;
@@ -47,8 +54,10 @@ import com.reader.modulereader.function.SPconfig;
 import com.reader.modulereader.function.ScreenListener;
 import com.reader.modulereader.mvp.MainContract;
 import com.reader.modulereader.mvp.MainPresenter;
+import com.reader.modulereader.utils.DateUtil;
 import com.reader.modulereader.utils.EventBusUtils;
 import com.reader.modulereader.utils.MessageEvent;
+import com.reader.modulereader.utils.StringUtil;
 import com.reader.modulereader.utils.ToastUtil;
 import com.uhf.api.cls.BackReadOption;
 import com.uhf.api.cls.ErrInfo;
@@ -69,6 +78,9 @@ import com.uhf.api.cls.Reader.SL_TagProtocol;
 import com.uhf.api.cls.Reader.TAGINFO;
 import com.uhf.api.cls.Reader.TagFilter_ST;
 
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
+
 import java.io.DataOutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -81,7 +93,7 @@ import java.util.Map;
 public class MainActivity<P extends MainContract.IMainPresenter> extends TabActivity implements MainContract.IMainView {
 
 	ExpandableListView tab4_left,tab4_right;
-	TextView tv_once,tv_state,tv_tags,tv_costt;
+	TextView tv_once,tv_state,tv_tags,tv_costt,mTvNotice,mTvNoticeTime;
 	Button button_read,button_stop,button_clear;
 	private ListView listView;
 
@@ -102,12 +114,11 @@ public class MainActivity<P extends MainContract.IMainPresenter> extends TabActi
 	List<Map<String, ?>> ListMs = new ArrayList<Map<String, ?>>();
 	MyAdapter Adapter;
 	Map<String, String> h = new HashMap<String, String>();
-    private TextView mText;
 	private GridView glList1;
     private BookAdapter bookAdapter1;
-    private ArrayList<String> bookList = new ArrayList<>();
+    private ArrayList<Course.CourseBean> bookList = new ArrayList<>();
 	private MainContract.IMainPresenter presenter;
-	private TextView text;
+	private LocationManager locationManager;
 
 	@Override
 	public void showView(int viewState) {
@@ -127,34 +138,101 @@ public class MainActivity<P extends MainContract.IMainPresenter> extends TabActi
 
 	}
 
-	@Override
-	public void getBookSuccess() {
 
+
+	@Override
+	public void getNoticeJsonServletSuccess(Notice notice) {
+		if (notice != null && notice.notices != null && notice.notices.size() > 0) {
+			StringBuilder sb = new StringBuilder();
+			StringBuilder sb1 = new StringBuilder();
+			for (int i = 0; i < notice.notices.size(); i++) {
+				if (i == 3) {
+					break;
+				}
+				sb.append(notice.notices.get(i).description+"\n");
+				sb1.append(notice.notices.get(i).createTime+"\n");
+			}
+			mTvNotice.setText(sb.toString());
+			mTvNoticeTime.setText(sb1.toString());
+		}
 	}
 
 	@Override
-	public void getBookError(ApiHttpException e) {
-
-	}
-
-	@Override
-	public void getPayInfosSuccess(PayInfo payInfoList) {
-		text.setText(payInfoList.ret_msg);
-	}
-
-	@Override
-	public void getPayInfosError(ApiHttpException e) {
+	public void getNoticeJsonServletError(ApiHttpException e) {
 		ToastUtil.toastS(e.getMessage());
 	}
 
 	@Override
-	public void getOrderDetailSuccess(OrderDetails orderDetails) {
-		text.setText(orderDetails.ret_msg);
+	public void getCourseJsonServletSuccess(Course course) {
+		if (course != null && course.course != null && course.course.size() > 0) {
+			for (Course.CourseBean courseBean : course.course) {
+				if (courseBean.end.contains(DateUtil.getCurrentDate())) {
+					bookList.add(courseBean);
+				}
+			}
+		}
+		bookAdapter1.notifyDataSetChanged();
 	}
 
 	@Override
-	public void getOrderDetailError(ApiHttpException e) {
+	public void getCourseJsonServletError(ApiHttpException e) {
 		ToastUtil.toastS(e.getMessage());
+	}
+
+	@Override
+	public void addlnglatJsonServletSuccess() {
+
+	}
+
+	@Override
+	public void addlnglatJsonServletError(ApiHttpException e) {
+		ToastUtil.toastS(e.getMessage());
+	}
+
+
+	@Override
+	protected void onStart() {
+		super.onStart();
+		EventBusUtils.register(this);
+	}
+
+	@Subscribe(threadMode = ThreadMode.MAIN)
+	public void MessageEvent(MessageEvent event) {
+		if (!StringUtil.isEmpty(event.getlat())) {
+			getPresenter().addlnglatJsonServlet(event.getlng(),event.getlat());
+		}
+	}
+
+	//实现定位的方法
+	public void location() {
+		//定义LocationManager对象
+		locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
+		//定义LocationManager对象
+		locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
+
+		//定义Criteria对象
+		Criteria criteria = new Criteria();
+		// 定位的精准度
+		criteria.setAccuracy(Criteria.ACCURACY_FINE);
+		// 海拔信息是否关注
+		criteria.setAltitudeRequired(false);
+		// 对周围的事情是否进行关心
+		criteria.setBearingRequired(false);
+		// 是否支持收费的查询
+		criteria.setCostAllowed(true);
+		// 是否耗电
+		criteria.setPowerRequirement(Criteria.POWER_LOW);
+		// 对速度是否关注
+		criteria.setSpeedRequired(false);
+
+		//得到最好的定位方式
+		String provider = locationManager.getBestProvider(criteria, true);
+		ToastUtil.toastS(provider);
+		//注册监听
+		if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+			return;
+		}
+		locationManager.requestLocationUpdates(provider, 100, 100, new MyLocationListener());
 	}
 
 	public class MyBroadcastReceiver extends BroadcastReceiver {
@@ -269,8 +347,8 @@ public class MainActivity<P extends MainContract.IMainPresenter> extends TabActi
 		boolean blen=myapp.Rpower.PowerUp();
 		if(!blen)
 			return false;
-		Toast.makeText(MainActivity.this, MyApplication.Constr_mainpu+String.valueOf(blen),
-				Toast.LENGTH_SHORT).show();
+//		Toast.makeText(MainActivity.this, MyApplication.Constr_mainpu+String.valueOf(blen),
+//				Toast.LENGTH_SHORT).show();
 
 		READER_ERR er=myapp.Mreader.InitReader_Notype(myapp.Address, myapp.antportc);
 		if(er==READER_ERR.MT_OK_ERR)
@@ -556,7 +634,6 @@ public class MainActivity<P extends MainContract.IMainPresenter> extends TabActi
 		String apkRoot="chmod 777 "+getPackageCodePath();
 
 		runRootCommand(apkRoot);
-        mText = findViewById(R.id.text);
 		soundPool= new SoundPool(10,AudioManager.STREAM_SYSTEM,5);
 		soundPool.load(this,R.raw.beep333,1);
 		Awl=new AndroidWakeLock((PowerManager) getSystemService(Context.POWER_SERVICE));
@@ -564,8 +641,8 @@ public class MainActivity<P extends MainContract.IMainPresenter> extends TabActi
 		Awl.WakeLock();
 		tabHost = (TabHost) findViewById(android.R.id.tabhost);
         bookAdapter1 = new BookAdapter(bookList, this);
-//        glList1 = (GridView) findViewById(R.id.gl_list1);
-//		glList1.setAdapter(bookAdapter1);
+        glList1 = (GridView) findViewById(R.id.gl_list1);
+		glList1.setAdapter(bookAdapter1);
 		tabHost.setup();
 		setPresenter();
 
@@ -621,8 +698,11 @@ public class MainActivity<P extends MainContract.IMainPresenter> extends TabActi
 		tv_state=(TextView)findViewById(R.id.textView_invstate);
 		tv_tags=(TextView)findViewById(R.id.textView_readallcnt);
 		tv_costt=(TextView)findViewById(R.id.textView_costtime);
-		text=(TextView)findViewById(R.id.text);
-		text.setOnClickListener(view ->getPresenter().getOrderDetail(396370) );
+		mTvNotice=(TextView)findViewById(R.id.notice_text);
+		mTvNoticeTime=(TextView)findViewById(R.id.notice_time);
+		mTvNotice.setOnClickListener(v -> location());
+		getPresenter().getNoticeJsonServlet();
+		getPresenter().getCourseJsonServlet();
 		for (int i = 0; i < Coname.length; i++)
 			h.put(Coname[i], Coname[i]);
 		myapp.needreconnect=false;
@@ -852,8 +932,8 @@ public class MainActivity<P extends MainContract.IMainPresenter> extends TabActi
                 do{
                     bl=reconnect();
                     if(!bl)
-                        Toast.makeText(MainActivity.this, MyApplication.Constr_sub1recfailed,
-                                Toast.LENGTH_SHORT).show();
+//                        Toast.makeText(MainActivity.this, MyApplication.Constr_sub1recfailed,
+//                                Toast.LENGTH_SHORT).show();
                     c++;
                     if(c>0)
                         break;
@@ -868,8 +948,9 @@ public class MainActivity<P extends MainContract.IMainPresenter> extends TabActi
                 READER_ERR er=myapp.Mreader.AsyncStartReading(myapp.Rparams.uants,
                         myapp.Rparams.uants.length, myapp.Rparams.option);
                 if(er!= READER_ERR.MT_OK_ERR)
-                {	 Toast.makeText(MainActivity.this, MyApplication.Constr_nostopreadfailed,
-                        Toast.LENGTH_SHORT).show();
+                {
+//					Toast.makeText(MainActivity.this, MyApplication.Constr_nostopreadfailed,
+//                        Toast.LENGTH_SHORT).show();
                     return;
                 }
             }
@@ -890,8 +971,8 @@ public class MainActivity<P extends MainContract.IMainPresenter> extends TabActi
                 //广播形式
                 if (StartReadTags()!= READER_ERR.MT_OK_ERR)
                 {
-                    Toast.makeText(MainActivity.this, MyApplication.Constr_nostopreadfailed,
-                            Toast.LENGTH_SHORT).show();
+//                    Toast.makeText(MainActivity.this, MyApplication.Constr_nostopreadfailed,
+//                            Toast.LENGTH_SHORT).show();
                     return;
                 }
             }
@@ -901,8 +982,8 @@ public class MainActivity<P extends MainContract.IMainPresenter> extends TabActi
 
         }catch(Exception ex)
         {
-            Toast.makeText(MainActivity.this, MyApplication.Constr_nostopreadfailed+ex.getMessage(),
-                    Toast.LENGTH_SHORT).show();
+//            Toast.makeText(MainActivity.this, MyApplication.Constr_nostopreadfailed+ex.getMessage(),
+//                    Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -925,7 +1006,13 @@ public class MainActivity<P extends MainContract.IMainPresenter> extends TabActi
 				epcstr = String.format("%-24s", epcstr);
 
 			m.put(Coname[1], epcstr);
-            bookList.add(epcstr);//增加数据
+			for (Course.CourseBean courseBean : bookList) {
+				if (epcstr.equals(courseBean.id)) {
+//          		bookList.add(epcstr);//增加数据
+					courseBean.readed = true;
+				}
+			}
+			bookAdapter1.notifyDataSetChanged();
 			String cs = m.get("次数");
 			if (cs == null)
 				cs = "0";
@@ -1109,8 +1196,8 @@ public class MainActivity<P extends MainContract.IMainPresenter> extends TabActi
 		int id = item.getItemId();
 		if(!button_read.isEnabled())
 		{
-			Toast.makeText(MainActivity.this, MyApplication.Constr_stopscan,
-					Toast.LENGTH_SHORT).show();
+//			Toast.makeText(MainActivity.this, MyApplication.Constr_stopscan,
+//					Toast.LENGTH_SHORT).show();
 		}
 		else{
 
@@ -1130,8 +1217,8 @@ public class MainActivity<P extends MainContract.IMainPresenter> extends TabActi
 			{
 				ErrInfo ei=new ErrInfo();
 				myapp.Mreader.GetLastDetailError(ei);
-				Toast.makeText(MainActivity.this, MyApplication.Constr_connectfialed+
-						"last:"+String.valueOf(ei.derrcode)+" "+ei.errstr,Toast.LENGTH_SHORT).show();
+//				Toast.makeText(MainActivity.this, MyApplication.Constr_connectfialed+
+//						"last:"+String.valueOf(ei.derrcode)+" "+ei.errstr,Toast.LENGTH_SHORT).show();
 			}
 		}
 		return super.onOptionsItemSelected(item);
@@ -1196,6 +1283,7 @@ public class MainActivity<P extends MainContract.IMainPresenter> extends TabActi
 
 	@Override
 	protected void onDestroy() {
+		EventBusUtils.unregister(this);
 		Awl.ReleaseWakeLock();
 		unregisterReceiver(mBroadcastReceiver);
 		System.exit(0);
@@ -1214,7 +1302,7 @@ public class MainActivity<P extends MainContract.IMainPresenter> extends TabActi
 	public boolean onKeyDown(int keyCode, KeyEvent event) {
 		if(keyCode == KeyEvent.KEYCODE_BACK && event.getAction() == KeyEvent.ACTION_DOWN){
 			if((System.currentTimeMillis()-myapp.exittime) > 2000){
-				Toast.makeText(getApplicationContext(), MyApplication.Constr_Putandexit, Toast.LENGTH_SHORT).show();
+//				Toast.makeText(getApplicationContext(), MyApplication.Constr_Putandexit, Toast.LENGTH_SHORT).show();
 				myapp.exittime = System.currentTimeMillis();
 			} else {
 				if(handler!=null)

@@ -140,8 +140,8 @@ public class Sub1TabActivity<OpeListActivity> extends Activity {
 
 						boolean blen=myapp.Rpower.PowerDown();
 
-						Toast.makeText(Sub1TabActivity.this, MyApplication.Constr_disconpowdown+String.valueOf(blen),
-								Toast.LENGTH_SHORT).show();
+//						Toast.makeText(Sub1TabActivity.this, MyApplication.Constr_disconpowdown+String.valueOf(blen),
+//								Toast.LENGTH_SHORT).show();
 						DisConnectHandleUI();
 					}
 
@@ -165,8 +165,8 @@ public class Sub1TabActivity<OpeListActivity> extends Activity {
 
 						//*
 						String  mod = android.os.Build.MODEL;
-						Toast.makeText(Sub1TabActivity.this, mod,
-								Toast.LENGTH_SHORT).show();
+//						Toast.makeText(Sub1TabActivity.this, mod,
+//								Toast.LENGTH_SHORT).show();
 						/*if (mod.equals("h901"))
 							myapp.Rpower = new RfidPower(PDATYPE.HANDEHUOER);
 						else if (mod.equals("SHT37"))
@@ -195,19 +195,19 @@ public class Sub1TabActivity<OpeListActivity> extends Activity {
 		String  ip=et1.getText().toString();
 		if(ip=="")
         {
-            Toast.makeText(Sub1TabActivity.this, MyApplication.Constr_sub1adrno,
-            Toast.LENGTH_SHORT).show();
+//            Toast.makeText(Sub1TabActivity.this, MyApplication.Constr_sub1adrno,
+//            Toast.LENGTH_SHORT).show();
         }
 		if(myapp.Rpower==null)
         {
-            Toast.makeText(Sub1TabActivity.this, MyApplication.Constr_sub1pdtsl,
-                    Toast.LENGTH_SHORT).show();
+//            Toast.makeText(Sub1TabActivity.this, MyApplication.Constr_sub1pdtsl,
+//                    Toast.LENGTH_SHORT).show();
         }
 
 		boolean blen=myapp.Rpower.PowerUp();
 
-		Toast.makeText(Sub1TabActivity.this, MyApplication.Constr_mainpu+String.valueOf(blen),
-                    Toast.LENGTH_SHORT).show();
+//		Toast.makeText(Sub1TabActivity.this, MyApplication.Constr_mainpu+String.valueOf(blen),
+//                    Toast.LENGTH_SHORT).show();
 		if(!blen)
         return;
 
@@ -221,8 +221,8 @@ public class Sub1TabActivity<OpeListActivity> extends Activity {
             myapp.spf.SaveString("ADDRESS", et1.getText().toString());
             myapp.spf.SaveString("ANTPORT", String.valueOf(spinner_antports.getSelectedItemPosition()));
 
-            Toast.makeText(Sub1TabActivity.this, MyApplication.Constr_connectok,
-            Toast.LENGTH_SHORT).show();
+//            Toast.makeText(Sub1TabActivity.this, MyApplication.Constr_connectok,
+//            Toast.LENGTH_SHORT).show();
             myapp.antportc=spinner_antports.getSelectedItemPosition()+1;
             ConnectHandleUI();
             myapp.Address=ip;
@@ -231,8 +231,8 @@ public class Sub1TabActivity<OpeListActivity> extends Activity {
             else
             {
 
-                Toast.makeText(Sub1TabActivity.this, MyApplication.Constr_connectfialed+
-                er.toString(),Toast.LENGTH_SHORT).show();
+//                Toast.makeText(Sub1TabActivity.this, MyApplication.Constr_connectfialed+
+//                er.toString(),Toast.LENGTH_SHORT).show();
             }
 	}
 
@@ -429,7 +429,7 @@ public class Sub1TabActivity<OpeListActivity> extends Activity {
 	public boolean onKeyDown(int keyCode, KeyEvent event) {
 	    if(keyCode == KeyEvent.KEYCODE_BACK && event.getAction() == KeyEvent.ACTION_DOWN){
 	        if((System.currentTimeMillis()-myapp.exittime) > 2000){
-	            Toast.makeText(getApplicationContext(), MyApplication.Constr_Putandexit, Toast.LENGTH_SHORT).show();
+//	            Toast.makeText(getApplicationContext(), MyApplication.Constr_Putandexit, Toast.LENGTH_SHORT).show();
 	            myapp.exittime = System.currentTimeMillis();
 	        } else {
 	            finish();

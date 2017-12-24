@@ -1,5 +1,7 @@
 package com.reader.modulereader.mvp;
 
+import com.reader.modulereader.entity.Course;
+import com.reader.modulereader.entity.Notice;
 import com.reader.modulereader.entity.OrderDetails;
 import com.reader.modulereader.entity.PayInfo;
 import com.reader.modulereader.exception.ApiHttpException;
@@ -15,31 +17,27 @@ import com.reader.modulereader.http.IPresenter;
 public interface MainContract {
     interface IMainView extends IBaseView {
 
-        void getBookSuccess();
+        void getNoticeJsonServletSuccess(Notice notice);
 
-        void getBookError(ApiHttpException e);
+        void getNoticeJsonServletError(ApiHttpException e);
 
-        void getPayInfosSuccess(PayInfo payInfoList);
+        void getCourseJsonServletSuccess(Course course);
 
-        void getPayInfosError(ApiHttpException e);
+        void getCourseJsonServletError(ApiHttpException e);
 
-        void getOrderDetailSuccess(OrderDetails orderDetails);
+        void addlnglatJsonServletSuccess();
 
-        void getOrderDetailError(ApiHttpException e);
-
-
+        void addlnglatJsonServletError(ApiHttpException e);
 
     }
 
     interface IMainPresenter extends IPresenter {
-        void getBook();
+        void getNoticeJsonServlet();
 
-        void getPayInfos();
-        /**
-         * 获取订单详情
-         * @param order_id 订单号
-         */
-        void getOrderDetail(int order_id);
+        void getCourseJsonServlet();
+
+        void addlnglatJsonServlet(String lng,String lat);
+
 
     }
 }

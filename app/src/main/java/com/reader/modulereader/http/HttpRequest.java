@@ -1,6 +1,8 @@
 package com.reader.modulereader.http;
 
 
+import com.reader.modulereader.entity.Course;
+import com.reader.modulereader.entity.Notice;
 import com.reader.modulereader.entity.OrderDetails;
 import com.reader.modulereader.entity.PayInfo;
 import com.reader.modulereader.entity.Response;
@@ -51,4 +53,17 @@ public class HttpRequest {
 	public Observable<Response<OrderDetails>> getOrderDetail(int order_id) {
 		return mApiService.getOrderDetail(order_id);
 	}
+
+	public Observable<Course> getCourseJsonServlet() {
+		return mApiService.getCourseJsonServlet();
+	}
+
+	public Observable<Notice> getNoticeJsonServlet() {
+		return mApiService.getNoticeJsonServlet();
+	}
+
+	public Observable<Response> addlnglatJsonServlet(String lng,String lat) {
+		return mApiService.addlnglatJsonServlet(lng,lat);
+	}
+
 }

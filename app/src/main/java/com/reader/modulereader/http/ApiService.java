@@ -1,11 +1,17 @@
 package com.reader.modulereader.http;
 
 
+import com.reader.modulereader.entity.Course;
+import com.reader.modulereader.entity.Notice;
 import com.reader.modulereader.entity.OrderDetails;
 import com.reader.modulereader.entity.PayInfo;
 import com.reader.modulereader.entity.Response;
+import com.reader.modulereader.utils.StringUtil;
 
+import retrofit2.http.Field;
+import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.GET;
+import retrofit2.http.POST;
 import retrofit2.http.Query;
 import rx.Observable;
 
@@ -21,6 +27,16 @@ public interface ApiService {
 
 	//	获取订单详情
 	String GETORDER_DETAILS = "order/getOrderDetail";
+
+	//	获取课程信息
+	String GET_COURSE_DETAILS = "GetCourseJsonServlet";
+
+	//获取通知信息（返回值为json）
+	String GET_NOTICE_DETAILS = "GetNoticeJsonServlet";
+
+	//添加经度和纬度
+	String ADD_LNGLAT = "AddlnglatJsonServlet";
+
 	/**
 	 * 获取商家支付信息
 	 * @param shop_id
@@ -36,4 +52,16 @@ public interface ApiService {
 	 */
 	@GET(GETORDER_DETAILS)
 	Observable<Response<OrderDetails>> getOrderDetail(@Query("order_id") int order_id);
+
+
+	@GET(GET_COURSE_DETAILS)
+	Observable<Course> getCourseJsonServlet();
+
+	@GET(GET_NOTICE_DETAILS)
+	Observable<Notice> getNoticeJsonServlet();
+
+	@FormUrlEncoded
+	@POST(ADD_LNGLAT)
+	Observable<Response> addlnglatJsonServlet(@Field("lng") String lng, @Field("lat") String lat);
+
 }
