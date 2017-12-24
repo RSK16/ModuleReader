@@ -54,13 +54,6 @@ public class BookAdapter extends BaseAdapter {
 
             // 初始化组件
             viewHolder.title = (TextView) convertView.findViewById(R.id.title);
-            if (titles.get(position).readed) {
-                viewHolder.title.setBackgroundResource(R.drawable.textview_round_border_green);
-                viewHolder.title.setTextColor(MyApplication.getInstance().getResources().getColor(R.color.green));
-            } else {
-                viewHolder.title.setBackgroundResource(R.drawable.textview_round_border_red);
-                viewHolder.title.setTextColor(MyApplication.getInstance().getResources().getColor(R.color.red));
-            }
             // 给converHolder附加一个对象
             convertView.setTag(viewHolder);
         } else {
@@ -70,7 +63,13 @@ public class BookAdapter extends BaseAdapter {
 
 
         viewHolder.title.setText(titles.get(position).title);
-
+        if (titles.get(position).readed==0) {
+            viewHolder.title.setBackgroundResource(R.drawable.textview_round_border_red);
+        } else if (titles.get(position).readed==1){
+            viewHolder.title.setBackgroundResource(R.drawable.textview_round_border_green);
+        }else if (titles.get(position).readed==2){
+            viewHolder.title.setBackgroundResource(R.drawable.textview_round_border_orange);
+        }
         return convertView;
     }
 

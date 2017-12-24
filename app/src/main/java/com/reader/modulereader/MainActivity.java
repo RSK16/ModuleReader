@@ -88,12 +88,13 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Timer;
+import java.util.TimerTask;
 
 @SuppressWarnings("deprecation")
 public class MainActivity<P extends MainContract.IMainPresenter> extends TabActivity implements MainContract.IMainView {
 
-	ExpandableListView tab4_left,tab4_right;
-	TextView tv_once,tv_state,tv_tags,tv_costt,mTvNotice,mTvNoticeTime;
+	TextView tv_once,tv_state,tv_tags,tv_costt,mTvNotice;
 	Button button_read,button_stop,button_clear;
 	private ListView listView;
 
@@ -117,8 +118,10 @@ public class MainActivity<P extends MainContract.IMainPresenter> extends TabActi
 	private GridView glList1;
     private BookAdapter bookAdapter1;
     private ArrayList<Course.CourseBean> bookList = new ArrayList<>();
+	private ArrayList<Course.CourseBean> readedbookList = new ArrayList<>();
 	private MainContract.IMainPresenter presenter;
 	private LocationManager locationManager;
+	private Timer timer;
 
 	@Override
 	public void showView(int viewState) {
@@ -144,16 +147,13 @@ public class MainActivity<P extends MainContract.IMainPresenter> extends TabActi
 	public void getNoticeJsonServletSuccess(Notice notice) {
 		if (notice != null && notice.notices != null && notice.notices.size() > 0) {
 			StringBuilder sb = new StringBuilder();
-			StringBuilder sb1 = new StringBuilder();
 			for (int i = 0; i < notice.notices.size(); i++) {
 				if (i == 3) {
 					break;
 				}
-				sb.append(notice.notices.get(i).description+"\n");
-				sb1.append(notice.notices.get(i).createTime+"\n");
+				sb.append("【通知】 ："+notice.notices.get(i).description+"     date: "+notice.notices.get(i).createTime+"\n");
 			}
 			mTvNotice.setText(sb.toString());
-			mTvNoticeTime.setText(sb1.toString());
 		}
 	}
 
@@ -164,6 +164,7 @@ public class MainActivity<P extends MainContract.IMainPresenter> extends TabActi
 
 	@Override
 	public void getCourseJsonServletSuccess(Course course) {
+		bookList.clear();
 		if (course != null && course.course != null && course.course.size() > 0) {
 			for (Course.CourseBean courseBean : course.course) {
 				if (courseBean.end.contains(DateUtil.getCurrentDate())) {
@@ -203,6 +204,14 @@ public class MainActivity<P extends MainContract.IMainPresenter> extends TabActi
 		}
 	}
 
+	TimerTask task= new TimerTask() {
+		@Override
+		public void run() {
+			getPresenter().getNoticeJsonServlet();
+			getPresenter().getCourseJsonServlet();
+		}
+	};
+
 	//实现定位的方法
 	public void location() {
 		//定义LocationManager对象
@@ -227,7 +236,7 @@ public class MainActivity<P extends MainContract.IMainPresenter> extends TabActi
 
 		//得到最好的定位方式
 		String provider = locationManager.getBestProvider(criteria, true);
-		ToastUtil.toastS(provider);
+//		ToastUtil.toastS(provider);
 		//注册监听
 		if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
 			return;
@@ -699,10 +708,10 @@ public class MainActivity<P extends MainContract.IMainPresenter> extends TabActi
 		tv_tags=(TextView)findViewById(R.id.textView_readallcnt);
 		tv_costt=(TextView)findViewById(R.id.textView_costtime);
 		mTvNotice=(TextView)findViewById(R.id.notice_text);
-		mTvNoticeTime=(TextView)findViewById(R.id.notice_time);
-		mTvNotice.setOnClickListener(v -> location());
-		getPresenter().getNoticeJsonServlet();
-		getPresenter().getCourseJsonServlet();
+//		mTvNotice.setOnClickListener(v -> location());
+		location();
+		timer = new Timer();
+		timer.schedule(task, 0,30*1000);
 		for (int i = 0; i < Coname.length; i++)
 			h.put(Coname[i], Coname[i]);
 		myapp.needreconnect=false;
@@ -1006,13 +1015,7 @@ public class MainActivity<P extends MainContract.IMainPresenter> extends TabActi
 				epcstr = String.format("%-24s", epcstr);
 
 			m.put(Coname[1], epcstr);
-			for (Course.CourseBean courseBean : bookList) {
-				if (epcstr.equals(courseBean.id)) {
-//          		bookList.add(epcstr);//增加数据
-					courseBean.readed = true;
-				}
-			}
-			bookAdapter1.notifyDataSetChanged();
+
 			String cs = m.get("次数");
 			if (cs == null)
 				cs = "0";
@@ -1059,7 +1062,22 @@ public class MainActivity<P extends MainContract.IMainPresenter> extends TabActi
 							String.valueOf(tf.RSSI));
 					m.put(Coname[6],
 							String.valueOf(tf.Frequency));
+					for (Course.CourseBean courseBean : bookList) {
+//									courseBean.readed = true;
+						if (epcstr.equals("E28011606000020AA9CC0123")) {
+							courseBean.readed = 1;
+						}
+					}
+					bookAdapter1.notifyDataSetChanged();
 					break;
+				} else {
+					for (Course.CourseBean courseBean : bookList) {
+//									courseBean.readed = true;
+						if (epcstr.equals("E28011606000020AA9CC0123")) {
+							courseBean.readed = 0;
+						}
+					}
+					bookAdapter1.notifyDataSetChanged();
 				}
 			}
 		}
@@ -1134,6 +1152,7 @@ public class MainActivity<P extends MainContract.IMainPresenter> extends TabActi
 						enreadt = (int) System.currentTimeMillis();
 						tv_costt.setText("  "
 								+ String.valueOf(enreadt - streadt));
+
 
 					}
 
@@ -1284,6 +1303,7 @@ public class MainActivity<P extends MainContract.IMainPresenter> extends TabActi
 	@Override
 	protected void onDestroy() {
 		EventBusUtils.unregister(this);
+		timer.cancel();
 		Awl.ReleaseWakeLock();
 		unregisterReceiver(mBroadcastReceiver);
 		System.exit(0);

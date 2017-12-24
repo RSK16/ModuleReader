@@ -246,7 +246,7 @@ public class MyApplication extends Application{
 				uants=new int[1];
 				uants[0]=1;
 				sleep=0;
-				readtime=5*1000;
+				readtime=50;
 				optime=1000;
 				opro="GEN2";
 				checkant=1;

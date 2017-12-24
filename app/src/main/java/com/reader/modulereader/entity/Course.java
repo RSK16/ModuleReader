@@ -26,7 +26,7 @@ public class Course {
          * start : 2017-12-20 08:00:00 03:30:00
          * title : 历史>
          */
-        public boolean readed;
+        public int readed;//0 要带 1 已读到 2 带多的
         public int allDay;
         public String color;
         public String end;
@@ -34,6 +34,9 @@ public class Course {
         public String start;
         public String title;
 
-      
+        public CourseBean(int readed, String title) {
+            this.readed = readed;
+            this.title = title;
+        }
     }
 }
