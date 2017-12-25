@@ -30,7 +30,6 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.Button;
-import android.widget.ExpandableListView;
 import android.widget.GridView;
 import android.widget.ListView;
 import android.widget.TabHost;
@@ -38,14 +37,13 @@ import android.widget.TabHost.OnTabChangeListener;
 import android.widget.TabHost.TabSpec;
 import android.widget.TabWidget;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.pow.api.cls.RfidPower;
 import com.pow.api.cls.RfidPower.PDATYPE;
+import com.reader.modulereader.entity.BaseCourse;
 import com.reader.modulereader.entity.Course;
+import com.reader.modulereader.entity.LocationBean;
 import com.reader.modulereader.entity.Notice;
-import com.reader.modulereader.entity.OrderDetails;
-import com.reader.modulereader.entity.PayInfo;
 import com.reader.modulereader.exception.ApiHttpException;
 import com.reader.modulereader.function.AndroidWakeLock;
 import com.reader.modulereader.function.MyAdapter;
@@ -54,8 +52,10 @@ import com.reader.modulereader.function.SPconfig;
 import com.reader.modulereader.function.ScreenListener;
 import com.reader.modulereader.mvp.MainContract;
 import com.reader.modulereader.mvp.MainPresenter;
+import com.reader.modulereader.utils.BaiduMapUtilByRacer;
 import com.reader.modulereader.utils.DateUtil;
 import com.reader.modulereader.utils.EventBusUtils;
+import com.reader.modulereader.utils.LogUtil;
 import com.reader.modulereader.utils.MessageEvent;
 import com.reader.modulereader.utils.StringUtil;
 import com.reader.modulereader.utils.ToastUtil;
@@ -118,10 +118,11 @@ public class MainActivity<P extends MainContract.IMainPresenter> extends TabActi
 	private GridView glList1;
     private BookAdapter bookAdapter1;
     private ArrayList<Course.CourseBean> bookList = new ArrayList<>();
-	private ArrayList<Course.CourseBean> readedbookList = new ArrayList<>();
+	private ArrayList<Course.CourseBean> preBookList = new ArrayList<>();
 	private MainContract.IMainPresenter presenter;
 	private LocationManager locationManager;
 	private Timer timer;
+	private List<BaseCourse.BasecourseBean> mBasecourse = new ArrayList<>();
 
 	@Override
 	public void showView(int viewState) {
@@ -151,7 +152,7 @@ public class MainActivity<P extends MainContract.IMainPresenter> extends TabActi
 				if (i == 3) {
 					break;
 				}
-				sb.append("【通知】 ："+notice.notices.get(i).description+"     date: "+notice.notices.get(i).createTime+"\n");
+				sb.append("【通知】 ："+notice.notices.get(i).name+"     date: "+notice.notices.get(i).createTime+"\n");
 			}
 			mTvNotice.setText(sb.toString());
 		}
@@ -190,6 +191,19 @@ public class MainActivity<P extends MainContract.IMainPresenter> extends TabActi
 		ToastUtil.toastS(e.getMessage());
 	}
 
+	@Override
+	public void GetBaseCourseJsonServletSuccess(BaseCourse baseCourse) {
+		mBasecourse.clear();
+		if (baseCourse != null && baseCourse.basecourse != null && baseCourse.basecourse.size() > 0) {
+			mBasecourse.addAll(baseCourse.basecourse);
+		}
+	}
+
+	@Override
+	public void GetBaseCourseJsonServletError(ApiHttpException e) {
+		ToastUtil.toastS(e.getMessage());
+	}
+
 
 	@Override
 	protected void onStart() {
@@ -211,6 +225,29 @@ public class MainActivity<P extends MainContract.IMainPresenter> extends TabActi
 			getPresenter().getCourseJsonServlet();
 		}
 	};
+
+	public void locate() {
+		BaiduMapUtilByRacer.locateByBaiduMap(getBaseContext(), 2000,
+				new BaiduMapUtilByRacer.LocateListener() {
+
+					@Override
+					public void onLocateSucceed(LocationBean locationBean) {
+						if (locationBean == null) {
+							return;
+						}
+						ToastUtil.toastS(locationBean.getLatitude()+","+locationBean.getLongitude());
+					}
+
+					@Override
+					public void onLocateFiled() {
+						LogUtil.i("<><><>失败");
+					}
+
+					@Override
+					public void onLocating() {
+					}
+				});
+	}
 
 	//实现定位的方法
 	public void location() {
@@ -708,10 +745,12 @@ public class MainActivity<P extends MainContract.IMainPresenter> extends TabActi
 		tv_tags=(TextView)findViewById(R.id.textView_readallcnt);
 		tv_costt=(TextView)findViewById(R.id.textView_costtime);
 		mTvNotice=(TextView)findViewById(R.id.notice_text);
-//		mTvNotice.setOnClickListener(v -> location());
-		location();
+		mTvNotice.setOnClickListener(v -> locate());
+		getPresenter().GetBaseCourseJsonServlet();
+//		location();
+
 		timer = new Timer();
-		timer.schedule(task, 0,30*1000);
+		timer.schedule(task, 0,6*1000);
 		for (int i = 0; i < Coname.length; i++)
 			h.put(Coname[i], Coname[i]);
 		myapp.needreconnect=false;
@@ -1062,22 +1101,7 @@ public class MainActivity<P extends MainContract.IMainPresenter> extends TabActi
 							String.valueOf(tf.RSSI));
 					m.put(Coname[6],
 							String.valueOf(tf.Frequency));
-					for (Course.CourseBean courseBean : bookList) {
-//									courseBean.readed = true;
-						if (epcstr.equals("E28011606000020AA9CC0123")) {
-							courseBean.readed = 1;
-						}
-					}
-					bookAdapter1.notifyDataSetChanged();
 					break;
-				} else {
-					for (Course.CourseBean courseBean : bookList) {
-//									courseBean.readed = true;
-						if (epcstr.equals("E28011606000020AA9CC0123")) {
-							courseBean.readed = 0;
-						}
-					}
-					bookAdapter1.notifyDataSetChanged();
 				}
 			}
 		}
@@ -1145,6 +1169,25 @@ public class MainActivity<P extends MainContract.IMainPresenter> extends TabActi
 								//刷新标签缓存
 								TagsBufferResh(tag[i], tfs);
 
+								if (mBasecourse!=null&&mBasecourse.size()>0) {
+									for (BaseCourse.BasecourseBean basecourseBean : mBasecourse) {
+										if (tag[i].equals(basecourseBean.EPCID)) {
+											//扫描到了  在服务器端配置了的  标签
+											boolean isExist = false;
+											for (int i1 = 0; i1 < bookList.size(); i1++) {
+												if (basecourseBean.COURSE.equals(bookList.get(i1).title)) {
+													isExist = true;
+													bookList.get(i1).readed = 1;
+												}
+											}
+											if (!isExist) {
+												bookList.add(new Course.CourseBean(2,basecourseBean.COURSE));
+											}
+										}
+									}
+								}
+
+								bookAdapter1.notifyDataSetChanged();
 							} else
 								break;
 						}
@@ -1152,8 +1195,6 @@ public class MainActivity<P extends MainContract.IMainPresenter> extends TabActi
 						enreadt = (int) System.currentTimeMillis();
 						tv_costt.setText("  "
 								+ String.valueOf(enreadt - streadt));
-
-
 					}
 
 				} else {
@@ -1189,6 +1230,7 @@ public class MainActivity<P extends MainContract.IMainPresenter> extends TabActi
 			} else {
 				Adapter.notifyDataSetChanged();
                 bookAdapter1.notifyDataSetChanged();
+
 			}
 			int cll = TagsMap.size();
 			if (cll < 0)

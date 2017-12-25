@@ -158,14 +158,12 @@
             android:orientation="horizontal" >
 
             <RadioButton
-                android:id="@+id/radio0"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:checked="true"
                 android:text="读" />
 
             <RadioButton
-                android:id="@+id/radio1"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="写" />
@@ -190,14 +188,12 @@
             android:orientation="horizontal" >
 
             <RadioButton
-                android:id="@+id/radio0"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:checked="true"
                 android:text="公共" />
 
             <RadioButton
-                android:id="@+id/radio1"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="私密" />
@@ -254,14 +250,12 @@
             android:orientation="horizontal" >
 
             <RadioButton
-                android:id="@+id/radio0"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:checked="true"
                 android:text="永久" />
 
             <RadioButton
-                android:id="@+id/radio1"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="临时" />

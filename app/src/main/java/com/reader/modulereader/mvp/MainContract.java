@@ -1,9 +1,8 @@
 package com.reader.modulereader.mvp;
 
+import com.reader.modulereader.entity.BaseCourse;
 import com.reader.modulereader.entity.Course;
 import com.reader.modulereader.entity.Notice;
-import com.reader.modulereader.entity.OrderDetails;
-import com.reader.modulereader.entity.PayInfo;
 import com.reader.modulereader.exception.ApiHttpException;
 import com.reader.modulereader.http.IBaseView;
 import com.reader.modulereader.http.IPresenter;
@@ -29,6 +28,10 @@ public interface MainContract {
 
         void addlnglatJsonServletError(ApiHttpException e);
 
+        void GetBaseCourseJsonServletSuccess(BaseCourse baseCourse);
+
+        void GetBaseCourseJsonServletError(ApiHttpException e);
+
     }
 
     interface IMainPresenter extends IPresenter {
@@ -37,6 +40,8 @@ public interface MainContract {
         void getCourseJsonServlet();
 
         void addlnglatJsonServlet(String lng,String lat);
+
+        void GetBaseCourseJsonServlet();
 
 
     }

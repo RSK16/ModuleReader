@@ -1,9 +1,8 @@
 package com.reader.modulereader.mvp;
 
+import com.reader.modulereader.entity.BaseCourse;
 import com.reader.modulereader.entity.Course;
 import com.reader.modulereader.entity.Notice;
-import com.reader.modulereader.entity.OrderDetails;
-import com.reader.modulereader.entity.PayInfo;
 import com.reader.modulereader.entity.Response;
 import com.reader.modulereader.exception.ApiHttpException;
 import com.reader.modulereader.http.HttpRequest;
@@ -81,7 +80,7 @@ public class MainPresenter extends RxPresenter<MainContract.IMainView> implement
         HttpSubscriber<Response> subscriber = new HttpSubscriber<Response>() {
             @Override
             protected void onError(ApiHttpException exception) {
-                view.getCourseJsonServletError(exception);
+                view.addlnglatJsonServletError(exception);
             }
 
             @Override
@@ -90,6 +89,30 @@ public class MainPresenter extends RxPresenter<MainContract.IMainView> implement
             }
         };
         HttpRequest.getInstance().addlnglatJsonServlet(lng,lat)
+                .compose(RxUtil.rxSchedulerHelper())
+                .subscribe(subscriber);
+
+        addSubscribe(subscriber);
+    }
+
+    @Override
+    public void GetBaseCourseJsonServlet() {
+        HttpSubscriber<BaseCourse> subscriber = new HttpSubscriber<BaseCourse>() {
+            @Override
+            protected void onError(ApiHttpException exception) {
+                view.GetBaseCourseJsonServletError(exception);
+            }
+
+            @Override
+            public void onNext(BaseCourse baseCourse ) {
+                if ("true".equals(baseCourse.re_tsg)) {
+                    view.GetBaseCourseJsonServletSuccess(baseCourse);
+                } else {
+                    onError(new ApiHttpException("接口请求失败",-1));
+                }
+            }
+        };
+        HttpRequest.getInstance().getBaseCourseJsonServlet()
                 .compose(RxUtil.rxSchedulerHelper())
                 .subscribe(subscriber);
 

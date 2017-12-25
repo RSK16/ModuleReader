@@ -1,10 +1,9 @@
 package com.reader.modulereader.http;
 
 
+import com.reader.modulereader.entity.BaseCourse;
 import com.reader.modulereader.entity.Course;
 import com.reader.modulereader.entity.Notice;
-import com.reader.modulereader.entity.OrderDetails;
-import com.reader.modulereader.entity.PayInfo;
 import com.reader.modulereader.entity.Response;
 
 import rx.Observable;
@@ -40,20 +39,6 @@ public class HttpRequest {
 		mHttpRequest = null;
 	}
 
-
-	/**
-	 * 获取商家支付信息
-	 * @param shop_id
-	 * @return
-	 */
-	public Observable<PayInfo> getPayInfos(String shop_id) {
-		return mApiService.getPayInfos(shop_id);
-	}
-
-	public Observable<Response<OrderDetails>> getOrderDetail(int order_id) {
-		return mApiService.getOrderDetail(order_id);
-	}
-
 	public Observable<Course> getCourseJsonServlet() {
 		return mApiService.getCourseJsonServlet();
 	}
@@ -66,4 +51,7 @@ public class HttpRequest {
 		return mApiService.addlnglatJsonServlet(lng,lat);
 	}
 
+	public Observable<BaseCourse> getBaseCourseJsonServlet() {
+		return mApiService.getBaseCourseJsonServlet();
+	}
 }
