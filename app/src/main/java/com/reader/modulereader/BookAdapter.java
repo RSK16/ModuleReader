@@ -9,6 +9,7 @@ import android.widget.TextView;
 
 import com.reader.modulereader.entity.Course;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -18,29 +19,38 @@ import java.util.List;
 public class BookAdapter extends BaseAdapter {
 
     private List<Course.BasecourseBean> titles;
+    private List<Course.BasecourseBean> titlesAll;
     private final Context context;
 
     public BookAdapter(List<Course.BasecourseBean> titles, Context context) {
         super();
         this.titles = titles;
         this.context = context;
+        titlesAll = new ArrayList<>();
+        for (Course.BasecourseBean basecourseBean : titles) {
+            if (basecourseBean.readed>0) {
+                titlesAll.add(basecourseBean);
+            }
+        }
+    }
 
+    public void updateAll(){
+        titlesAll.clear();
+        for (Course.BasecourseBean basecourseBean : titles) {
+            if (basecourseBean.readed>0) {
+                titlesAll.add(basecourseBean);
+            }
+        }
     }
 
     @Override
     public int getCount() {
-        int count = 0;
-        for (Course.BasecourseBean basecourseBean : titles) {
-            if (basecourseBean.readed!=0) {
-                count++;
-            }
-        }
-        return count;
+        return titlesAll.size();
     }
 
     @Override
     public Object getItem(int i) {
-        return titles.get(i);
+        return titlesAll.get(i);
     }
 
     @Override
@@ -66,12 +76,12 @@ public class BookAdapter extends BaseAdapter {
             // 取得converHolder附加的对象
             viewHolder = (ViewHolder) convertView.getTag();
         }
-        viewHolder.title.setText(titles.get(position).COURSE);
-        if (titles.get(position).readed==1) {
+        viewHolder.title.setText(titlesAll.get(position).COURSE);
+        if (titlesAll.get(position).readed==1) {
             viewHolder.title.setBackgroundResource(R.drawable.textview_round_border_red);
-        } else if (titles.get(position).readed==2){
+        } else if (titlesAll.get(position).readed==2){
             viewHolder.title.setBackgroundResource(R.drawable.textview_round_border_green);
-        }else if (titles.get(position).readed==3){
+        } else if (titlesAll.get(position).readed == 3) {
             viewHolder.title.setBackgroundResource(R.drawable.textview_round_border_orange);
         }
         return convertView;

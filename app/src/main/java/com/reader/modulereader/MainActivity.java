@@ -172,7 +172,7 @@ public class MainActivity<P extends MainContract.IMainPresenter> extends TabActi
 				}
 			}
 		}
-
+		bookAdapter1.updateAll();
 		bookAdapter1.notifyDataSetChanged();
 	}
 
@@ -1072,7 +1072,7 @@ public class MainActivity<P extends MainContract.IMainPresenter> extends TabActi
 	}
 
 	private boolean re;
-	private int num= 0;
+	private int numAll=0;
 	private Runnable runnable_MainActivity = new Runnable() {
 		public void run() {
 
@@ -1095,6 +1095,7 @@ public class MainActivity<P extends MainContract.IMainPresenter> extends TabActi
 				//Log.d("MYINFO","read:" + er.toString() + " cnt:"+ String.valueOf(tagcnt[0]));
 
 				if (er == READER_ERR.MT_OK_ERR) {
+					boolean be = false;
 					if (tagcnt[0] > 0) {
 						tv_once.setText(String.valueOf(tagcnt[0]));
 
@@ -1195,6 +1196,7 @@ public class MainActivity<P extends MainContract.IMainPresenter> extends TabActi
 									}
 									mBean.count = 0;
 									mBean.list.clear();
+									bookAdapter1.updateAll();
 									bookAdapter1.notifyDataSetChanged();
 								}
 							}
@@ -1204,26 +1206,32 @@ public class MainActivity<P extends MainContract.IMainPresenter> extends TabActi
 						tv_costt.setText("  "
 								+ String.valueOf(enreadt - streadt));
 					} else {
-						num++;
-						if (num == 6) {
-							num=0;
-							for (Course.BasecourseBean basecourseBean : mBasecourse) {
-								basecourseBean.current_read = false;
-								boolean b = false;
-								for (Course.CourseBean courseBean : todaylist) {
-									if (courseBean.title.equals(basecourseBean.COURSE)) {//扫描到的标签 是今天的
-										b = true;
-									}
+						be = true;
+					}
+					if (be) {
+						numAll++;
+					} else {
+						numAll = 0;
+					}
+					if (numAll == 6) {
+						numAll = 0;
+						for (Course.BasecourseBean basecourseBean : mBasecourse) {
+							basecourseBean.current_read = false;
+							boolean b = false;
+							for (Course.CourseBean courseBean : todaylist) {
+								if (courseBean.title.equals(basecourseBean.COURSE)) {//扫描到的标签 是今天的
+									b = true;
 								}
-								if (b) {
-									basecourseBean.readed = 1;
-								} else {
-									basecourseBean.readed = 0;
-								}
-							}
-							bookAdapter1.notifyDataSetChanged();
-						}
 
+							}
+							if (b) {
+								basecourseBean.readed = 1;
+							} else {
+								basecourseBean.readed = 0;
+							}
+						}
+						bookAdapter1.updateAll();
+						bookAdapter1.notifyDataSetChanged();
 					}
 				} else {
 					tv_state.setText("error:" + String.valueOf(er.value())
