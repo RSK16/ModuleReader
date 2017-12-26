@@ -3,6 +3,7 @@ package com.reader.modulereader;
 import android.app.Application;
 import android.widget.TabHost;
 
+import com.baidu.mapapi.SDKInitializer;
 import com.blankj.utilcode.util.Utils;
 import com.pow.api.cls.RfidPower;
 import com.reader.modulereader.function.SPconfig;
@@ -32,8 +33,11 @@ public class MyApplication extends Application{
 	public void onCreate() {
 		super.onCreate();
 		mDDApplication = this;
+		//在使用百度地图SDK各组件之前初始化context信息，传入ApplicationContext
+		//注意该方法要再setContentView方法之前实现
 		initUtils();
 		initCrashHandler();
+		SDKInitializer.initialize(this);
 	}
 	private void initUtils() {
 		Utils.init(this);

@@ -17,10 +17,10 @@ import java.util.List;
 
 public class BookAdapter extends BaseAdapter {
 
-    private List<Course.CourseBean> titles;
+    private List<Course.BasecourseBean> titles;
     private final Context context;
 
-    public BookAdapter(List<Course.CourseBean> titles, Context context) {
+    public BookAdapter(List<Course.BasecourseBean> titles, Context context) {
         super();
         this.titles = titles;
         this.context = context;
@@ -29,7 +29,13 @@ public class BookAdapter extends BaseAdapter {
 
     @Override
     public int getCount() {
-        return titles.size();
+        int count = 0;
+        for (Course.BasecourseBean basecourseBean : titles) {
+            if (basecourseBean.readed!=0) {
+                count++;
+            }
+        }
+        return count;
     }
 
     @Override
@@ -60,14 +66,12 @@ public class BookAdapter extends BaseAdapter {
             // 取得converHolder附加的对象
             viewHolder = (ViewHolder) convertView.getTag();
         }
-
-
-        viewHolder.title.setText(titles.get(position).title);
-        if (titles.get(position).readed==0) {
+        viewHolder.title.setText(titles.get(position).COURSE);
+        if (titles.get(position).readed==1) {
             viewHolder.title.setBackgroundResource(R.drawable.textview_round_border_red);
-        } else if (titles.get(position).readed==1){
+        } else if (titles.get(position).readed==2){
             viewHolder.title.setBackgroundResource(R.drawable.textview_round_border_green);
-        }else if (titles.get(position).readed==2){
+        }else if (titles.get(position).readed==3){
             viewHolder.title.setBackgroundResource(R.drawable.textview_round_border_orange);
         }
         return convertView;

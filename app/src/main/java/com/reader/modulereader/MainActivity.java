@@ -1,24 +1,19 @@
 package com.reader.modulereader;
 
-import android.Manifest;
 import android.app.Application;
 import android.app.TabActivity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
-import android.location.Criteria;
-import android.location.LocationManager;
 import android.media.AudioManager;
 import android.media.SoundPool;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.os.PowerManager;
-import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -41,6 +36,7 @@ import android.widget.TextView;
 import com.pow.api.cls.RfidPower;
 import com.pow.api.cls.RfidPower.PDATYPE;
 import com.reader.modulereader.entity.BaseCourse;
+import com.reader.modulereader.entity.Bean;
 import com.reader.modulereader.entity.Course;
 import com.reader.modulereader.entity.LocationBean;
 import com.reader.modulereader.entity.Notice;
@@ -55,7 +51,6 @@ import com.reader.modulereader.mvp.MainPresenter;
 import com.reader.modulereader.utils.BaiduMapUtilByRacer;
 import com.reader.modulereader.utils.DateUtil;
 import com.reader.modulereader.utils.EventBusUtils;
-import com.reader.modulereader.utils.LogUtil;
 import com.reader.modulereader.utils.MessageEvent;
 import com.reader.modulereader.utils.StringUtil;
 import com.reader.modulereader.utils.ToastUtil;
@@ -117,13 +112,11 @@ public class MainActivity<P extends MainContract.IMainPresenter> extends TabActi
 	Map<String, String> h = new HashMap<String, String>();
 	private GridView glList1;
     private BookAdapter bookAdapter1;
-    private ArrayList<Course.CourseBean> bookList = new ArrayList<>();
-	private ArrayList<Course.CourseBean> preBookList = new ArrayList<>();
+	private ArrayList<Course.CourseBean> todaylist = new ArrayList<>();
 	private MainContract.IMainPresenter presenter;
-	private LocationManager locationManager;
 	private Timer timer;
-	private List<BaseCourse.BasecourseBean> mBasecourse = new ArrayList<>();
-
+	private List<Course.BasecourseBean> mBasecourse = new ArrayList<>();
+	private Bean mBean = new Bean();
 	@Override
 	public void showView(int viewState) {
 
@@ -142,8 +135,6 @@ public class MainActivity<P extends MainContract.IMainPresenter> extends TabActi
 
 	}
 
-
-
 	@Override
 	public void getNoticeJsonServletSuccess(Notice notice) {
 		if (notice != null && notice.notices != null && notice.notices.size() > 0) {
@@ -152,7 +143,7 @@ public class MainActivity<P extends MainContract.IMainPresenter> extends TabActi
 				if (i == 3) {
 					break;
 				}
-				sb.append("【通知】 ："+notice.notices.get(i).name+"     date: "+notice.notices.get(i).createTime+"\n");
+				sb.append("【通知】 ："+notice.notices.get(i).name+" "+notice.notices.get(i).description+"     date: "+notice.notices.get(i).createTime+"\n");
 			}
 			mTvNotice.setText(sb.toString());
 		}
@@ -165,14 +156,23 @@ public class MainActivity<P extends MainContract.IMainPresenter> extends TabActi
 
 	@Override
 	public void getCourseJsonServletSuccess(Course course) {
-		bookList.clear();
+		todaylist.clear();
 		if (course != null && course.course != null && course.course.size() > 0) {
+			if (mBasecourse.size() == 0) {
+				mBasecourse.addAll(course.basecourse);
+			}
 			for (Course.CourseBean courseBean : course.course) {
 				if (courseBean.end.contains(DateUtil.getCurrentDate())) {
-					bookList.add(courseBean);
+					todaylist.add(courseBean);
+					for (Course.BasecourseBean basecourseBean : mBasecourse) {
+						if (basecourseBean.COURSE.equals(courseBean.title)&&basecourseBean.readed==0) {
+							basecourseBean.readed =1;
+						}
+					}
 				}
 			}
 		}
+
 		bookAdapter1.notifyDataSetChanged();
 	}
 
@@ -193,10 +193,7 @@ public class MainActivity<P extends MainContract.IMainPresenter> extends TabActi
 
 	@Override
 	public void GetBaseCourseJsonServletSuccess(BaseCourse baseCourse) {
-		mBasecourse.clear();
-		if (baseCourse != null && baseCourse.basecourse != null && baseCourse.basecourse.size() > 0) {
-			mBasecourse.addAll(baseCourse.basecourse);
-		}
+
 	}
 
 	@Override
@@ -227,7 +224,7 @@ public class MainActivity<P extends MainContract.IMainPresenter> extends TabActi
 	};
 
 	public void locate() {
-		BaiduMapUtilByRacer.locateByBaiduMap(getBaseContext(), 2000,
+		BaiduMapUtilByRacer.locateByBaiduMap(getBaseContext(), 50*1000,
 				new BaiduMapUtilByRacer.LocateListener() {
 
 					@Override
@@ -235,12 +232,12 @@ public class MainActivity<P extends MainContract.IMainPresenter> extends TabActi
 						if (locationBean == null) {
 							return;
 						}
-						ToastUtil.toastS(locationBean.getLatitude()+","+locationBean.getLongitude());
+//						ToastUtil.toastS(locationBean.getLatitude()+","+locationBean.getLongitude());
+						getPresenter().addlnglatJsonServlet(locationBean.getLongitude()+"",locationBean.getLatitude()+"");
 					}
 
 					@Override
 					public void onLocateFiled() {
-						LogUtil.i("<><><>失败");
 					}
 
 					@Override
@@ -249,37 +246,6 @@ public class MainActivity<P extends MainContract.IMainPresenter> extends TabActi
 				});
 	}
 
-	//实现定位的方法
-	public void location() {
-		//定义LocationManager对象
-		locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
-		//定义LocationManager对象
-		locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
-
-		//定义Criteria对象
-		Criteria criteria = new Criteria();
-		// 定位的精准度
-		criteria.setAccuracy(Criteria.ACCURACY_FINE);
-		// 海拔信息是否关注
-		criteria.setAltitudeRequired(false);
-		// 对周围的事情是否进行关心
-		criteria.setBearingRequired(false);
-		// 是否支持收费的查询
-		criteria.setCostAllowed(true);
-		// 是否耗电
-		criteria.setPowerRequirement(Criteria.POWER_LOW);
-		// 对速度是否关注
-		criteria.setSpeedRequired(false);
-
-		//得到最好的定位方式
-		String provider = locationManager.getBestProvider(criteria, true);
-//		ToastUtil.toastS(provider);
-		//注册监听
-		if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-			return;
-		}
-		locationManager.requestLocationUpdates(provider, 100, 100, new MyLocationListener());
-	}
 
 	public class MyBroadcastReceiver extends BroadcastReceiver {
 		public static final String TAG = "MyBroadcastReceiver";
@@ -686,7 +652,7 @@ public class MainActivity<P extends MainContract.IMainPresenter> extends TabActi
 
 		Awl.WakeLock();
 		tabHost = (TabHost) findViewById(android.R.id.tabhost);
-        bookAdapter1 = new BookAdapter(bookList, this);
+        bookAdapter1 = new BookAdapter(mBasecourse, getBaseContext());
         glList1 = (GridView) findViewById(R.id.gl_list1);
 		glList1.setAdapter(bookAdapter1);
 		tabHost.setup();
@@ -745,10 +711,8 @@ public class MainActivity<P extends MainContract.IMainPresenter> extends TabActi
 		tv_tags=(TextView)findViewById(R.id.textView_readallcnt);
 		tv_costt=(TextView)findViewById(R.id.textView_costtime);
 		mTvNotice=(TextView)findViewById(R.id.notice_text);
-		mTvNotice.setOnClickListener(v -> locate());
-		getPresenter().GetBaseCourseJsonServlet();
-//		location();
-
+//		mTvNotice.setOnClickListener(v -> locate());
+		locate();
 		timer = new Timer();
 		timer.schedule(task, 0,6*1000);
 		for (int i = 0; i < Coname.length; i++)
@@ -1107,6 +1071,7 @@ public class MainActivity<P extends MainContract.IMainPresenter> extends TabActi
 		}
 	}
 
+	private boolean re;
 	private Runnable runnable_MainActivity = new Runnable() {
 		public void run() {
 
@@ -1169,25 +1134,68 @@ public class MainActivity<P extends MainContract.IMainPresenter> extends TabActi
 								//刷新标签缓存
 								TagsBufferResh(tag[i], tfs);
 
-								if (mBasecourse!=null&&mBasecourse.size()>0) {
-									for (BaseCourse.BasecourseBean basecourseBean : mBasecourse) {
-										if (tag[i].equals(basecourseBean.EPCID)) {
-											//扫描到了  在服务器端配置了的  标签
-											boolean isExist = false;
-											for (int i1 = 0; i1 < bookList.size(); i1++) {
-												if (basecourseBean.COURSE.equals(bookList.get(i1).title)) {
-													isExist = true;
-													bookList.get(i1).readed = 1;
-												}
-											}
-											if (!isExist) {
-												bookList.add(new Course.CourseBean(2,basecourseBean.COURSE));
-											}
+								mBean.count++;
+								if (mBean.list==null) {
+									mBean.list = new ArrayList<>();
+								}
+								if (mBean.list.size() > 0) {
+									re = false;
+									for (String s : mBean.list) {
+										if (s.equals(tag[i])) {
+											re = true;
 										}
 									}
+									if (!re) {
+										mBean.list.add(tag[i]);
+									}
+								} else {
+									mBean.list.add(tag[i]);
 								}
+								if (mBean.count == 3) {
+									for (Course.BasecourseBean basecourseBean : mBasecourse) {
+										basecourseBean.current_read = false;
+									}
+									for (String s : mBean.list) {
+										if (mBasecourse != null && mBasecourse.size() > 0) {
+											for (Course.BasecourseBean basecourseBean : mBasecourse) {
+												if (s.equals(basecourseBean.EPCID)) {//扫描到了标签
+													basecourseBean.current_read = true;
+													boolean isToday = false;
+													for (Course.CourseBean courseBean : todaylist) {
+														if (courseBean.title.equals(basecourseBean.COURSE)) {//扫描到的标签 是今天的
+															isToday = true;
+														}
+													}
+													if (isToday) {
+														basecourseBean.readed = 2;
+													} else {
+														basecourseBean.readed = 3;
+													}
+												}
+											}
 
-								bookAdapter1.notifyDataSetChanged();
+										}
+									}
+									for (Course.BasecourseBean basecourseBean : mBasecourse) {
+										if (!basecourseBean.current_read) {
+											boolean b = false;
+											for (Course.CourseBean courseBean : todaylist) {
+												if (courseBean.title.equals(basecourseBean.COURSE)) {//扫描到的标签 是今天的
+													b = true;
+												}
+											}
+											if (b) {
+												basecourseBean.readed = 1;
+											} else {
+												basecourseBean.readed = 0;
+											}
+
+										}
+									}
+									mBean.count =0;
+									mBean.list.clear();
+									bookAdapter1.notifyDataSetChanged();
+								}
 							} else
 								break;
 						}
@@ -1196,7 +1204,6 @@ public class MainActivity<P extends MainContract.IMainPresenter> extends TabActi
 						tv_costt.setText("  "
 								+ String.valueOf(enreadt - streadt));
 					}
-
 				} else {
 					tv_state.setText("error:" + String.valueOf(er.value())
 							+ " " + er.toString());
@@ -1229,8 +1236,6 @@ public class MainActivity<P extends MainContract.IMainPresenter> extends TabActi
 				tag = new String[0];
 			} else {
 				Adapter.notifyDataSetChanged();
-                bookAdapter1.notifyDataSetChanged();
-
 			}
 			int cll = TagsMap.size();
 			if (cll < 0)
@@ -1352,11 +1357,11 @@ public class MainActivity<P extends MainContract.IMainPresenter> extends TabActi
 		super.onDestroy();
 		if (presenter != null)
 			presenter.detachView();
+		BaiduMapUtilByRacer.stopAndDestroyLocate();
 	}
 
 	@Override
 	public void onPause(){
-
 		super.onPause();
 	}
 

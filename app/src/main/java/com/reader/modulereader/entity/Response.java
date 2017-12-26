@@ -16,6 +16,7 @@ public class Response<T> {
 
 	public int ret_code;
 	public String ret_msg;
+	public String re_tsg;
 	public String message;
 	public T data;
 
