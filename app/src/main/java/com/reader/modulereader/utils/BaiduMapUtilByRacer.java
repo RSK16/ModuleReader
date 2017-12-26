@@ -71,7 +71,10 @@ public class BaiduMapUtilByRacer {
 	public static class MyLocationListenner implements BDLocationListener {
 		@Override
 		public void onReceiveLocation(BDLocation location) {
-
+			if (location.getLocType()!=161) {
+//				ToastUtil.toastS(location.getLocType()+"");
+				return;
+			}
 			LocationBean mLocationBean = new LocationBean();
 			mLocationBean.setLatitude(location.getLatitude());
 			mLocationBean.setLongitude(location.getLongitude());

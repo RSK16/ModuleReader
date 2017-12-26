@@ -188,7 +188,7 @@ public class MainActivity<P extends MainContract.IMainPresenter> extends TabActi
 
 	@Override
 	public void addlnglatJsonServletError(ApiHttpException e) {
-		ToastUtil.toastS(e.getMessage());
+//		ToastUtil.toastS(e.getMessage());
 	}
 
 	@Override
@@ -910,9 +910,9 @@ public class MainActivity<P extends MainContract.IMainPresenter> extends TabActi
             @Override
             public void run() {
                 try {
-                    Thread.sleep(500);
+                    Thread.sleep(1000);
                     EventBusUtils.post(new MessageEvent("sa"));
-                    Thread.sleep(500);
+                    Thread.sleep(1000);
                     Message mes=new Message();
                     mes.what=4;
                     handler2.sendMessage(mes);
@@ -1072,6 +1072,7 @@ public class MainActivity<P extends MainContract.IMainPresenter> extends TabActi
 	}
 
 	private boolean re;
+	private int num= 0;
 	private Runnable runnable_MainActivity = new Runnable() {
 		public void run() {
 
@@ -1110,7 +1111,7 @@ public class MainActivity<P extends MainContract.IMainPresenter> extends TabActi
 								}
 							}
 							if (myapp.nostop)
-								er=myapp.Mreader.AsyncGetNextTag(tfs);
+								er = myapp.Mreader.AsyncGetNextTag(tfs);
 							else
 								er = myapp.Mreader.GetNextTag(tfs);
 
@@ -1135,7 +1136,7 @@ public class MainActivity<P extends MainContract.IMainPresenter> extends TabActi
 								TagsBufferResh(tag[i], tfs);
 
 								mBean.count++;
-								if (mBean.list==null) {
+								if (mBean.list == null) {
 									mBean.list = new ArrayList<>();
 								}
 								if (mBean.list.size() > 0) {
@@ -1151,7 +1152,7 @@ public class MainActivity<P extends MainContract.IMainPresenter> extends TabActi
 								} else {
 									mBean.list.add(tag[i]);
 								}
-								if (mBean.count == 3) {
+								if (mBean.count == 60) {
 									for (Course.BasecourseBean basecourseBean : mBasecourse) {
 										basecourseBean.current_read = false;
 									}
@@ -1192,17 +1193,37 @@ public class MainActivity<P extends MainContract.IMainPresenter> extends TabActi
 
 										}
 									}
-									mBean.count =0;
+									mBean.count = 0;
 									mBean.list.clear();
 									bookAdapter1.notifyDataSetChanged();
 								}
-							} else
-								break;
+							}
 						}
 
 						enreadt = (int) System.currentTimeMillis();
 						tv_costt.setText("  "
 								+ String.valueOf(enreadt - streadt));
+					} else {
+						num++;
+						if (num == 6) {
+							num=0;
+							for (Course.BasecourseBean basecourseBean : mBasecourse) {
+								basecourseBean.current_read = false;
+								boolean b = false;
+								for (Course.CourseBean courseBean : todaylist) {
+									if (courseBean.title.equals(basecourseBean.COURSE)) {//扫描到的标签 是今天的
+										b = true;
+									}
+								}
+								if (b) {
+									basecourseBean.readed = 1;
+								} else {
+									basecourseBean.readed = 0;
+								}
+							}
+							bookAdapter1.notifyDataSetChanged();
+						}
+
 					}
 				} else {
 					tv_state.setText("error:" + String.valueOf(er.value())

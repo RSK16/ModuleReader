@@ -10,6 +10,7 @@ import retrofit2.http.Field;
 import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.GET;
 import retrofit2.http.POST;
+import retrofit2.http.Query;
 import rx.Observable;
 
 /**
@@ -38,9 +39,8 @@ public interface ApiService {
 	@GET(GET_NOTICE_DETAILS)
 	Observable<Notice> getNoticeJsonServlet();
 
-	@FormUrlEncoded
-	@POST(ADD_LNGLAT)
-	Observable<Response> addlnglatJsonServlet(@Field("lng") String lng, @Field("lat") String lat);
+	@GET(ADD_LNGLAT)
+	Observable<Response> addlnglatJsonServlet(@Query("lng") String lng, @Query("lat") String lat);
 
 
 	@GET(GET_BASE_COURSE_DETAILS)
