@@ -89,7 +89,7 @@ import java.util.TimerTask;
 @SuppressWarnings("deprecation")
 public class MainActivity<P extends MainContract.IMainPresenter> extends TabActivity implements MainContract.IMainView {
 
-	TextView tv_once,tv_state,tv_tags,tv_costt,mTvNotice;
+	TextView tv_once,tv_state,tv_tags,tv_costt,mTvNotice,today_time;
 	Button button_read,button_stop,button_clear;
 	private ListView listView;
 
@@ -143,7 +143,7 @@ public class MainActivity<P extends MainContract.IMainPresenter> extends TabActi
 				if (i == 3) {
 					break;
 				}
-				sb.append("【通知】 ："+notice.notices.get(i).name+" "+notice.notices.get(i).description+"     date: "+notice.notices.get(i).createTime+"\n");
+				sb.append("【通知】 ："+notice.notices.get(i).name+" "+notice.notices.get(i).description+"   "+notice.notices.get(i).createTime+"\n");
 			}
 			mTvNotice.setText(sb.toString());
 		}
@@ -711,6 +711,8 @@ public class MainActivity<P extends MainContract.IMainPresenter> extends TabActi
 		tv_tags=(TextView)findViewById(R.id.textView_readallcnt);
 		tv_costt=(TextView)findViewById(R.id.textView_costtime);
 		mTvNotice=(TextView)findViewById(R.id.notice_text);
+		today_time = (TextView)findViewById(R.id.today_time);
+		today_time.setText(DateUtil.getCurDay()+" "+DateUtil.dateToString());
 //		mTvNotice.setOnClickListener(v -> locate());
 		locate();
 		timer = new Timer();

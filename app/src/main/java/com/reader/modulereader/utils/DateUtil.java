@@ -2,6 +2,7 @@ package com.reader.modulereader.utils;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 
 
@@ -56,6 +57,39 @@ public class DateUtil {
 
 	public static String getCurDay() {
 		return new SimpleDateFormat("yyyy-MM-dd").format(new Date(System.currentTimeMillis()));
+	}
+
+	public static String dateToString(){
+		Calendar cl = Calendar.getInstance();
+		cl.setTime(new Date(System.currentTimeMillis()));
+		int i = cl.get(Calendar.DAY_OF_WEEK);
+		String week_of_day = "未知";
+		switch (i) {
+			case Calendar.SATURDAY:
+				week_of_day = "星期六";
+				break;
+			case Calendar.SUNDAY:
+				week_of_day = "星期日";
+				break;
+			case Calendar.MONDAY:
+				week_of_day = "星期一";
+				break;
+			case Calendar.TUESDAY:
+				week_of_day = "星期二";
+				break;
+			case Calendar.WEDNESDAY:
+				week_of_day = "星期三";
+				break;
+			case Calendar.THURSDAY:
+				week_of_day = "星期四";
+				break;
+			case Calendar.FRIDAY:
+				week_of_day = "星期五";
+				break;
+			default:
+				break;
+		}
+		return week_of_day;
 	}
 
 	public static long getToDayTime() {

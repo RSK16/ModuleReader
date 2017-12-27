@@ -79,11 +79,20 @@
             android:orientation="vertical"
             android:layout_width="match_parent"
             android:layout_height="match_parent">
+            <TextView
+                android:id="@+id/today_time"
+                android:gravity="center"
+                android:text=""
+                android:textSize="20dp"
+                android:textStyle="bold"
+                android:textColor="@color/black"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"/>
             <GridView
                 android:layout_weight="1"
                 android:padding="10dp"
                 android:id="@+id/gl_list1"
-                android:numColumns="6"
+                android:numColumns="4"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"/>
             <View
